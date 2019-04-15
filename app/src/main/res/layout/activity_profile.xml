@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ProfileActivity"
+    android:background="@color/dark_gray">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/green"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme" />
+
+    <ImageView
+        android:id="@+id/profilePicture"
+        android:layout_width="match_parent"
+        android:layout_height="253dp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="45dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/profile_name"
+        android:textColor="@color/white"
+        android:paddingLeft="20dp"
+        android:textSize="20dp"/>
+
+
+    <TextView
+        android:id="@+id/txtName"
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:paddingLeft="40dp"
+        android:textColor="@color/white" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="30dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/profile_username"
+        android:textColor="@color/white"
+        android:paddingLeft="20dp"
+        android:textSize="20dp"
+        />
+
+    <TextView
+        android:id="@+id/txtUsername"
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:paddingLeft="40dp"
+        android:textColor="@color/white" />
+</LinearLayout>

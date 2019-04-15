@@ -1,3 +1,19 @@
 <resources>
-    <string name="app_name">ChatApplication</string>
+    <string name="app_name">ChatApp</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="button_login">Login</string>
+    <string name="text_register">No account?</string>
+    <string name="button_register">Register</string>
+    <string name="hint_repeat_password">Repeat Password</string>
+    <string name="txtName">Contact Name</string>
+    <string name="txtLastChat">Last Message</string>
+    <string name="imgProfile">Profile Picture</string>
+    <string name="profile_name">Full Name:</string>
+    <string name="profile_username">Username:</string>
+    <string name="logout">Logout</string>
+    <string name="btnAddUser">Add User</string>
 </resources>
