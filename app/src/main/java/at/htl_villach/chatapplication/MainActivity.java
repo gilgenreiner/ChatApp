@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -34,11 +35,22 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
+                //warsch switch
                 if(menuItem.getItemId() == R.id.mnLogout) {
                     firebaseAuth.signOut();
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     intent.putExtra("allowBack", false);
                     startActivity(intent);
+                    return true;
+                }
+                else if(menuItem.getItemId() == R.id.mnEditProfile) {
+                    Toast.makeText(MainActivity.this, "Temporary toast for menuItem Edit!",
+                            Toast.LENGTH_LONG).show();
+                    return true;
+                }
+                else if(menuItem.getItemId() == R.id.mnDeleteProfile) {
+                    Toast.makeText(MainActivity.this, "Temporary toast for menuItem Delete!",
+                            Toast.LENGTH_LONG).show();
                     return true;
                 }
                 return false;

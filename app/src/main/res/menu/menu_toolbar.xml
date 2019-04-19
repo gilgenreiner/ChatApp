@@ -6,4 +6,14 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
         android:title="@string/logout"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/mnEditProfile"
+        android:title="@string/editProfile"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/mnDeleteProfile"
+        android:title="@string/deleteProfile"
+        app:showAsAction="never"
+        />
 </menu>
