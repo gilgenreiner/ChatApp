@@ -16,4 +16,5 @@
     <string name="profile_username">Username:</string>
     <string name="logout">Logout</string>
     <string name="btnAddUser">Add User</string>
+    <string name="menuChatProfil">Kontakt ansehen</string>
 </resources>

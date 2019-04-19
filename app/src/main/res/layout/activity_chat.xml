@@ -1,10 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/dark_gray"
-    tools:context="at.htl_villach.chatapplication.ChatActivity">
+    tools:context=".MainActivity">
 
-</android.widget.LinearLayout>
+    <include
+        android:id="@+id/chat_toolbar"
+        layout="@layout/toolbar_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </include>
+
+</android.support.constraint.ConstraintLayout>
