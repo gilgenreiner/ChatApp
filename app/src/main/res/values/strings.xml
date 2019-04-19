@@ -16,4 +16,6 @@
     <string name="profile_username">Username:</string>
     <string name="logout">Logout</string>
     <string name="btnAddUser">Add User</string>
+    <string name="editProfile">Edit Profile</string>
+    <string name="deleteProfile">Delete Profile</string>
 </resources>
