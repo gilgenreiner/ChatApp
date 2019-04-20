@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ChatApp.iml" filepath="$PROJECT_DIR$/ChatApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/ChatAppGit.iml" filepath="$PROJECT_DIR$/ChatAppGit.iml" />
       <module fileurl="file://$PROJECT_DIR$/ChatApplication.iml" filepath="$PROJECT_DIR$/ChatApplication.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ChatAppplication.iml" filepath="$PROJECT_DIR$/ChatAppplication.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
