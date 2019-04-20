@@ -21,7 +21,7 @@
         <activity android:name=".AddUserActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".RegisterActivity" />
-
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>
