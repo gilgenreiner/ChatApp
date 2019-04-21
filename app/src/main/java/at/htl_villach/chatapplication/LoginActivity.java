@@ -10,7 +10,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -61,9 +63,15 @@ public class LoginActivity extends AppCompatActivity {
                                 String email = (String) user.getData().get("email");
                                 String realPassword = (String) user.getData().get("password");
                                 if(password.equals(realPassword) ) {
-                                    firebaseAuth.signInWithEmailAndPassword(email, password);
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    startActivity(intent);
+                                    firebaseAuth.signInWithEmailAndPassword(email, password)
+                                    .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                                        @Override
+                                        public void onSuccess(AuthResult authResult) {
+                                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                            startActivity(intent);
+                                        }
+                                    });
+
                                 } else {
                                     Toast.makeText(getApplicationContext(), "Wrong password.", Toast.LENGTH_SHORT).show();
                                 }

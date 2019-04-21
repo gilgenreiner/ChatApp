@@ -3,12 +3,18 @@ package at.htl_villach.chatapplication.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.view.ViewGroup;
 
 import at.htl_villach.chatapplication.fragments.chats;
 import at.htl_villach.chatapplication.fragments.contacts;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
-    int numberTabs;
+    private int numberTabs;
+    private Fragment currFragment;
+
+    public Fragment getCurrentFragment() {
+        return currFragment;
+    }
 
     public PagerAdapter(FragmentManager fm, int numTabs) {
         super(fm);
@@ -19,6 +25,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch(position) {
             case 0:
+
                 contacts contactSection = new contacts();
                 return contactSection;
 
@@ -35,5 +42,13 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         return numberTabs;
+    }
+
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+        if(getCurrentFragment() != object) {
+            currFragment = (Fragment) object;
+        }
+        super.setPrimaryItem(container, position, object);
     }
 }
