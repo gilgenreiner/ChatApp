@@ -12,6 +12,9 @@ public class User implements Parcelable {
     private String password;
     private String state;
 
+    public User() {
+
+    }
     public User(String name, String email, int profilePictureResource, String userName, String state, String password) {
         this.name = name;
         this.state = state;
