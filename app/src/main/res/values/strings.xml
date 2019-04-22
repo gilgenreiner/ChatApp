@@ -19,4 +19,6 @@
     <string name="btnAddUser">Add User</string>
     <string name="editProfile">Edit Profile</string>
     <string name="deleteProfile">Delete Profile</string>
+    <string name="btnSaveEditedProfile">Save</string>
+    <string name="btnCancel">Cancel</string>
 </resources>

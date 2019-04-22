@@ -80,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
                 else if(menuItem.getItemId() == R.id.mnEditProfile) {
                     Toast.makeText(MainActivity.this, "Temporary toast for menuItem Edit!",
                             Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, EditProfileActivity.class);
+                    intent.putExtra("allowBack", false);
+                    startActivity(intent);
                     return true;
                 }
                 else if(menuItem.getItemId() == R.id.mnDeleteProfile) {
