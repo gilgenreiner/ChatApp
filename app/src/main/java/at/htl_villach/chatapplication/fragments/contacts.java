@@ -100,6 +100,9 @@ public class contacts extends Fragment {
                             if(document.exists()) {
                                 arrUsers.clear();
                                 arrFriends = (ArrayList<String>) document.getData().get("friends");
+                                if(arrFriends == null) {
+                                    arrFriends = new ArrayList<>();
+                                }
                                 loadFriendDetails();
                             }  else {
                                 Toast.makeText(getContext(), "Current User not found in Database.", Toast.LENGTH_SHORT).show();
