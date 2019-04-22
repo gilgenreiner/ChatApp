@@ -5,10 +5,13 @@ import android.graphics.Color;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,11 +23,17 @@ import at.htl_villach.chatapplication.bll.User;
 public class ChatActivity extends AppCompatActivity {
 
     private User selectedContact;
+    private User currentUser;
 
     //toolbar
     Toolbar toolbar;
     TextView toolbarTextView;
     ImageView toolbarImageView;
+
+    //normal controlls
+    EditText messageToSend;
+    ImageButton btnSend;
+    RecyclerView recyclerViewMessages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +43,7 @@ public class ChatActivity extends AppCompatActivity {
         Intent intent = getIntent();
         selectedContact = (User) intent.getParcelableExtra("selectedContact");
 
-        toolbar = (Toolbar) findViewById(R.id.chat_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_chat);
         toolbarImageView = (ImageView) toolbar.findViewById(R.id.toolbarImageView);
         toolbarTextView = (TextView) toolbar.findViewById(R.id.toolbarTextView);
         setSupportActionBar(toolbar);
@@ -57,7 +66,6 @@ public class ChatActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
         //ToDo image
         /*if(selectedContact.getProfilePicture() == 0) {
             toolbarImageView.setImageResource(R.drawable.standard_picture);
@@ -65,6 +73,9 @@ public class ChatActivity extends AppCompatActivity {
             toolbarImageView.setImageResource(selectedContact.getProfilePicture());
         }*/
 
+        EditText messageToSend = (EditText) findViewById(R.id.message_to_send);
+        ImageButton btnSend = (ImageButton) findViewById(R.id.btn_send);
+        RecyclerView recyclerViewMessages = (RecyclerView) findViewById(R.id.recycler_view_messages);
     }
 
     @Override
