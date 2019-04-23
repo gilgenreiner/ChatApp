@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,7 +16,6 @@ import at.htl_villach.chatapplication.bll.User;
 
 public class ContactAdapter extends BaseAdapter {
     ArrayList<User> contacts;
-    ArrayList<String> lastMessages;
     LayoutInflater inflater;
 
 
@@ -25,11 +25,6 @@ public class ContactAdapter extends BaseAdapter {
         this.inflater = (LayoutInflater.from(applicationContext));
     }
 
-    public ContactAdapter(Context applicationContext, ArrayList<User> contacts, ArrayList<String> lastMessages) {
-        this.contacts = contacts;
-        this.inflater = (LayoutInflater.from(applicationContext));
-        this.lastMessages = lastMessages;
-    }
 
     @Override
     public int getCount() {
@@ -54,15 +49,22 @@ public class ContactAdapter extends BaseAdapter {
 
 
         ImageView image = (ImageView) view.findViewById(R.id.profilePicture);
-        item.setText(contacts.get(i).getName());
-        if(lastMessages != null) {
-            subitem.setText(lastMessages.get(i));
-        } else {
-            subitem.setText(contacts.get(i).getState());
-        }
+        ImageButton btnBeginChat = view.findViewById(R.id.btnBeginChat);
+
+        item.setText(contacts.get(i).getFullname());
+
+        subitem.setText(contacts.get(i).getUsername());
+
         if(contacts.get(i).getProfilePicture() == 0) {
             image.setImageResource(R.drawable.standard_picture);
         }
+
+        btnBeginChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         //image.setImageResource(flags[i]);
         return view;

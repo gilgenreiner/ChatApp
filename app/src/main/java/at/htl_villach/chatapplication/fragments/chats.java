@@ -29,7 +29,7 @@ public class chats extends Fragment {
         arrUsers = new ArrayList<User>();
         arrLastMessage = new ArrayList<String>();
 
-        adapter = new ContactAdapter(getContext(), arrUsers, arrLastMessage);
+        adapter = new ContactAdapter(getContext(), arrUsers);
 
         final ListView lvChats = rootView.findViewById(R.id.lvChats);
         lvChats.setAdapter(adapter);
@@ -57,13 +57,13 @@ public class chats extends Fragment {
     }
 
     private void insertTestData() {
-        arrUsers.add(new User("Max Mustermann1", "mustermann@gmail.com", 0, "muster373", "Status1", "passwort123"));
-        arrUsers.add(new User("Max Mustermann2", "mustermann@gmail.com", 0, "muster373", "Status1", "passwort123"));
-        arrUsers.add(new User("Max Mustermann3", "mustermann@gmail.com", 0, "muster373", "Status1", "passwort123"));
-        arrUsers.add(new User("Max Mustermann4", "mustermann@gmail.com", 0, "muster373", "Status1", "passwort123"));
-        arrUsers.add(new User("Max Mustermann5", "mustermann@gmail.com", 0, "muster373", "Status1", "passwort123"));
-        arrUsers.add(new User("Max Mustermann6", "mustermann@gmail.com", 0, "muster373", "Status1", "passwort123"));
-        arrUsers.add(new User("Max Mustermann7", "mustermann@gmail.com", 0, "muster373", "Status1", "passwort123"));
+        arrUsers.add(new User("Max Mustermann1", "mustermann@gmail.com","muster373"));
+        arrUsers.add(new User("Max Mustermann2", "mustermann@gmail.com", "muster333"));
+        arrUsers.add(new User("Max Mustermann3", "mustermann@gmail.com", "muster3563"));
+        arrUsers.add(new User("Max Mustermann4", "mustermann@gmail.com", "muster3452"));
+        arrUsers.add(new User("Max Mustermann5", "mustermann@gmail.com", "muster3766"));
+        arrUsers.add(new User("Max Mustermann6", "mustermann@gmail.com", "muster3235463"));
+        arrUsers.add(new User("Max Mustermann7", "mustermann@gmail.com", "muster37765"));
 
         arrLastMessage.add("Hallo1");
         arrLastMessage.add("Hallo2");
@@ -72,8 +72,6 @@ public class chats extends Fragment {
         arrLastMessage.add("Hallo5");
         arrLastMessage.add("Hallo6");
         arrLastMessage.add("Hallo7");
-        arrLastMessage.add("Hallo8");
-        arrLastMessage.add("Hallo9");
         adapter.notifyDataSetChanged();
 
     }

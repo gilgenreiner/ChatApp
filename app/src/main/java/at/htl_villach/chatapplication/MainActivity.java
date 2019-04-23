@@ -13,6 +13,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import at.htl_villach.chatapplication.adapters.PagerAdapter;
 import at.htl_villach.chatapplication.fragments.contacts;
@@ -20,6 +23,7 @@ import at.htl_villach.chatapplication.fragments.contacts;
 public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth firebaseAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     intent.putExtra("allowBack", false);
                     startActivity(intent);
+                    finish();
                     return true;
                 }
                 else if(menuItem.getItemId() == R.id.mnRefresh) {

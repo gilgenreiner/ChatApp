@@ -17,7 +17,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         final ImageView profilePicture = findViewById(R.id.profilePicture);
         final TextView txtName = findViewById(R.id.txtName);
-        final TextView txtUsername = findViewById(R.id.txtUsername);
+        final TextView txtUsername = findViewById(R.id.txtFullName);
         final Toolbar toolProfile = findViewById(R.id.toolProfile);
         Intent intent = getIntent();
 
@@ -27,8 +27,8 @@ public class ProfileActivity extends AppCompatActivity {
         } else {
             profilePicture.setImageResource(selectedContact.getProfilePicture());
         }
-        txtName.setText(selectedContact.getName());
-        txtUsername.setText(selectedContact.getUserName());
+        txtName.setText(selectedContact.getFullname());
+        txtUsername.setText(selectedContact.getUsername());
         toolProfile.setTitle("Contact Details");
     }
 }

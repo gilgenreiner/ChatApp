@@ -5,31 +5,33 @@ import android.os.Parcelable;
 
 public class User implements Parcelable {
 
+    private String id;
+    private String fullname;
     private int profilePictureResource;
-    private String name;
     private String email;
-    private String userName;
-    private String password;
-    private String state;
+    private String username;
 
     public User() {
-
+        super();
+        this.id = null;
+        this.email = null;
+        this.username = null;
+        this.profilePictureResource = 0;
     }
-    public User(String name, String email, int profilePictureResource, String userName, String state, String password) {
-        this.name = name;
-        this.state = state;
+
+
+    public User(String id, String email, String username) {
+        this.id = id;
         this.email = email;
-        this.userName = userName;
-        this.profilePictureResource = profilePictureResource;
-        this.password = password;
+        this.username = username;
+        this.profilePictureResource = 0;
     }
 
     protected User(Parcel in) {
+        id = in.readString();
         profilePictureResource = in.readInt();
-        name = in.readString();
         email = in.readString();
-        userName = in.readString();
-        state = in.readString();
+        username = in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -44,28 +46,15 @@ public class User implements Parcelable {
         }
     };
 
-    public String getName() {
-        return name;
+
+    public String getUsername() {
+        return username;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
+    public void setUsername(String username) { this.username = username; }
 
     public int getProfilePicture() {
         return profilePictureResource;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
 
@@ -76,10 +65,33 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
         dest.writeInt(profilePictureResource);
-        dest.writeString(name);
         dest.writeString(email);
-        dest.writeString(userName);
-        dest.writeString(state);
+        dest.writeString(username);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 }
