@@ -1,9 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
+    android:background="#e6e6e6"
     tools:context=".MainActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -11,9 +11,37 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <include
+        <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_chat"
-            layout="@layout/toolbar_chat"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <ImageView
+                android:id="@+id/toolbar_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_acion_back" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/toolbar_profilpicture"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="25dp"
+                android:src="@drawable/standard_picture"/>
+
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="25dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="#fff" />
+
+        </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
@@ -48,6 +76,6 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:background="@drawable/ic_send_24dp" />
-
     </RelativeLayout>
+
 </RelativeLayout>

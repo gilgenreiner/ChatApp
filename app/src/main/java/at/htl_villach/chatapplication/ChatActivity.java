@@ -1,10 +1,11 @@
 package at.htl_villach.chatapplication;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -14,26 +15,51 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import at.htl_villach.chatapplication.adapters.ChatAdapter;
+import at.htl_villach.chatapplication.bll.Chat;
+import at.htl_villach.chatapplication.bll.Message;
 import at.htl_villach.chatapplication.bll.User;
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 public class ChatActivity extends AppCompatActivity {
 
-    private User selectedContact;
+    private User selectedContact;       //change to currentChat
     private User currentUser;
+
+    private List<Message> mMessages = new ArrayList<Message>();
 
     //toolbar
     Toolbar toolbar;
-    TextView toolbarTextView;
-    ImageView toolbarImageView;
+    TextView toolbarTitle;
+    ImageView toolbarActionBack;
+    CircleImageView toolbarPicture;
 
     //normal controlls
     EditText messageToSend;
     ImageButton btnSend;
     RecyclerView recyclerViewMessages;
+
+    //Database
+    FirebaseUser fuser;
+    //DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,21 +70,47 @@ public class ChatActivity extends AppCompatActivity {
         selectedContact = (User) intent.getParcelableExtra("selectedContact");
 
         toolbar = (Toolbar) findViewById(R.id.toolbar_chat);
-        toolbarImageView = (ImageView) toolbar.findViewById(R.id.toolbarImageView);
-        toolbarTextView = (TextView) toolbar.findViewById(R.id.toolbarTextView);
+        toolbarActionBack = (ImageView) findViewById(R.id.toolbar_back);
+        toolbarPicture = (CircleImageView) findViewById(R.id.toolbar_profilpicture);
+        toolbarTitle = (TextView) findViewById(R.id.toolbar_title);
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        toolbar.setNavigationIcon(R.drawable.ic_acion_back);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        toolbarActionBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
 
-        toolbarTextView.setText(selectedContact.getName());
-        toolbarTextView.setOnClickListener(new View.OnClickListener() {
+        if(selectedContact.getProfilePicture() != 0) {
+            toolbarPicture.setImageResource(selectedContact.getProfilePicture());
+        }
+
+        toolbarPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(ChatActivity.this);
+                View mView = getLayoutInflater().inflate(R.layout.dialog_profilpicture, null);
+
+                ImageView image = (ImageView) mView.findViewById(R.id.dialog_profilePicture);
+                TextView title = (TextView) mView.findViewById(R.id.dialog_title);
+
+                if(selectedContact.getProfilePicture() != 0) {
+                    image.setImageResource(selectedContact.getProfilePicture());
+                }
+
+                title.setText(selectedContact.getName());
+
+                mBuilder.setView(mView);
+                AlertDialog dialog = mBuilder.create();
+                dialog.show();
+            }
+        });
+
+        toolbarTitle.setText(selectedContact.getName());
+        toolbarTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ChatActivity.this, ProfileActivity.class);
@@ -66,16 +118,21 @@ public class ChatActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        //ToDo image
-        /*if(selectedContact.getProfilePicture() == 0) {
-            toolbarImageView.setImageResource(R.drawable.standard_picture);
-        } else {
-            toolbarImageView.setImageResource(selectedContact.getProfilePicture());
-        }*/
 
-        EditText messageToSend = (EditText) findViewById(R.id.message_to_send);
-        ImageButton btnSend = (ImageButton) findViewById(R.id.btn_send);
-        RecyclerView recyclerViewMessages = (RecyclerView) findViewById(R.id.recycler_view_messages);
+        messageToSend = (EditText) findViewById(R.id.message_to_send);
+
+        btnSend = (ImageButton) findViewById(R.id.btn_send);
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               sendMessage("mkleinegger", "1", messageToSend.getText().toString());
+            }
+        });
+
+        recyclerViewMessages = (RecyclerView) findViewById(R.id.recycler_view_messages);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        linearLayoutManager.setStackFromEnd(true);
+        recyclerViewMessages.setLayoutManager(linearLayoutManager);
     }
 
     @Override
@@ -95,5 +152,13 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sendMessage(String sender, String chat_id, String message){
+        Message message1 = new Message(sender, chat_id, message, "12:20");
+        mMessages.add(message1);
+
+        ChatAdapter chatAdapter = new ChatAdapter(ChatActivity.this, mMessages);
+        recyclerViewMessages.setAdapter(chatAdapter);
     }
 }
