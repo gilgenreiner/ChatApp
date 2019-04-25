@@ -12,15 +12,17 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import at.htl_villach.chatapplication.R;
+import at.htl_villach.chatapplication.bll.Chat;
 import at.htl_villach.chatapplication.bll.User;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatListAdapter extends BaseAdapter {
-    ArrayList<User> contacts;
+    ArrayList<Chat> contacts;
     LayoutInflater inflater;
 
 
 
-    public ChatListAdapter(Context applicationContext, ArrayList<User> contacts) {
+    public ChatListAdapter(Context applicationContext, ArrayList<Chat> contacts) {
         this.contacts = contacts;
         this.inflater = (LayoutInflater.from(applicationContext));
     }
@@ -48,15 +50,15 @@ public class ChatListAdapter extends BaseAdapter {
         TextView subitem = view.findViewById(R.id.txtLastChat);
 
 
-        ImageView image = (ImageView) view.findViewById(R.id.profilePicture);
+        CircleImageView image = (CircleImageView) view.findViewById(R.id.list_picture);
 
-        item.setText(contacts.get(i).getFullname());
+        item.setText(contacts.get(i).getId());
 
-        subitem.setText(contacts.get(i).getUsername());
+        //subitem.setText(contacts.get(i).getUsername());
 
-        if(contacts.get(i).getProfilePicture() == 0) {
-            image.setImageResource(R.drawable.standard_picture);
-        }
+        //if(contacts.get(i).getProfilePicture() == 0) {
+        //    image.setImageResource(R.drawable.standard_picture);
+        //}
 
 
         //image.setImageResource(flags[i]);

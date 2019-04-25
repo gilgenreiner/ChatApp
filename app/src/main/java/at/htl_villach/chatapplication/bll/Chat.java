@@ -13,6 +13,23 @@ import java.util.HashMap;
 public class Chat implements Parcelable {
 
     private String id;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public HashMap<String, String> getUsers() {
+        return users;
+    }
+
+    public void setUsers(HashMap<String, String> users) {
+        this.users = users;
+    }
+
     private HashMap<String, String> users;
 
     public Chat(String id, HashMap<String, String> users) {
@@ -47,4 +64,5 @@ public class Chat implements Parcelable {
         dest.writeString(id);
         dest.writeMap(users);
     }
+
 }

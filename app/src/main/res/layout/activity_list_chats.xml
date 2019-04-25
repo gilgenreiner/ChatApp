@@ -16,16 +16,13 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <ImageView
-                android:id="@+id/profilePicture"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:background="@drawable/image_border"
-                android:contentDescription="@string/imgProfile"
-                android:padding="5dp"
-                android:scaleType="fitXY"
-                android:src="@mipmap/ic_launcher" />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/list_picture"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/standard_picture" />
         </LinearLayout>
 
         <LinearLayout
