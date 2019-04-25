@@ -48,26 +48,39 @@ public class RegisterActivity extends AppCompatActivity {
                 final String password = txtPassword.getEditText().getText().toString();
                 String repeatPassword = txtRepeatPassword.getEditText().getText().toString();
                 final String fullname = txtFullname.getEditText().getText().toString();
+                boolean error = false;
 
                 if (TextUtils.isEmpty(username)) {
                     txtUsername.setError("Please fill in your username.");
                     Toast.makeText(getApplicationContext(), "Please fill in your username.", Toast.LENGTH_SHORT).show();
-                } else if (TextUtils.isEmpty(email)) {
+                    error= true;
+                }
+                if (TextUtils.isEmpty(email)) {
                     txtEmail.setError("Please fill in your email address.");
                     Toast.makeText(getApplicationContext(), "Please fill in your email address.", Toast.LENGTH_SHORT).show();
-                } else if (TextUtils.isEmpty(password)) {
+                    error= true;
+                }
+                if (TextUtils.isEmpty(password)) {
                     txtPassword.setError("Please fill in your password.");
                     Toast.makeText(getApplicationContext(), "Please fill in your password.", Toast.LENGTH_SHORT).show();
-                } else if (password.length() < 7) {
+                    error= true;
+                }
+                if (password.length() < 7) {
                     txtPassword.setError("Your password must be at least 7 characters.");
                     Toast.makeText(getApplicationContext(), "Your password must be at least 7 characters.", Toast.LENGTH_SHORT).show();
-                } else if (!TextUtils.equals(password, repeatPassword)) {
+                    error= true;
+                }
+                if (!TextUtils.equals(password, repeatPassword)) {
                     txtRepeatPassword.setError("The passwords do not match.");
                     Toast.makeText(getApplicationContext(), "The passwords do not match.", Toast.LENGTH_SHORT).show();
-                } else if(TextUtils.isEmpty(fullname)) {
+                    error= true;
+                }
+                if(TextUtils.isEmpty(fullname)) {
                     txtFullname.setError("Please fill in your Full Name.");
                     Toast.makeText(getApplicationContext(), "Please fill in your Full Name.", Toast.LENGTH_SHORT).show();
-                } else {
+                    error= true;
+                }
+                if(!error){
                     firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 
                         @Override

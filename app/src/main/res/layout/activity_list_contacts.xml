@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,20 +13,17 @@
         android:weightSum="4">
 
         <LinearLayout
-            android:layout_width="40dp"
+            android:layout_width="35dp"
             android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <ImageView
-                android:id="@+id/profilePicture"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:background="@drawable/image_border"
-                android:contentDescription="@string/imgProfile"
-                android:padding="5dp"
-                android:scaleType="fitXY"
-                android:src="@mipmap/ic_launcher" />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/list_picture"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/standard_picture" />
         </LinearLayout>
 
         <LinearLayout
@@ -56,13 +54,13 @@
                 android:textSize="12dp" />
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/btnBeginChat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/imageNewChat"
+            android:layout_width="50dp"
+            android:layout_height="42dp"
             android:layout_gravity="center_vertical"
-            android:focusable="false"
             android:layout_weight="1"
-            app:srcCompat="@drawable/ic_chat_white" />
+            android:src="@drawable/ic_chat_white" />
+
     </LinearLayout>
 </LinearLayout>
