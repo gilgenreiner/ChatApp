@@ -17,20 +17,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import at.htl_villach.chatapplication.adapters.ChatAdapter;
 import at.htl_villach.chatapplication.bll.Chat;
@@ -41,8 +30,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private User selectedContact;       //change to currentChat
-    private User currentUser;
+    private Chat currentChat;       //change to currentChat
 
     private List<Message> mMessages = new ArrayList<Message>();
 
@@ -67,7 +55,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         Intent intent = getIntent();
-        selectedContact = (User) intent.getParcelableExtra("selectedContact");
+        currentChat = (Chat) intent.getParcelableExtra("selectedChat");
 
         toolbar = (Toolbar) findViewById(R.id.toolbar_chat);
         toolbarActionBack = (ImageView) findViewById(R.id.toolbar_back);
@@ -84,9 +72,9 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        if(selectedContact.getProfilePicture() != 0) {
-            toolbarPicture.setImageResource(selectedContact.getProfilePicture());
-        }
+        //if(selectedContact.getProfilePicture() != 0) {
+        //    toolbarPicture.setImageResource(selectedContact.getProfilePicture());
+        //}
 
         toolbarPicture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,11 +85,11 @@ public class ChatActivity extends AppCompatActivity {
                 ImageView image = (ImageView) mView.findViewById(R.id.dialog_profilePicture);
                 TextView title = (TextView) mView.findViewById(R.id.dialog_title);
 
-                if(selectedContact.getProfilePicture() != 0) {
-                    image.setImageResource(selectedContact.getProfilePicture());
-                }
+                //if(selectedContact.getProfilePicture() != 0) {
+                //    image.setImageResource(selectedContact.getProfilePicture());
+                //}
 
-                title.setText(selectedContact.getFullname());
+                title.setText("TestPerson");
 
                 mBuilder.setView(mView);
                 AlertDialog dialog = mBuilder.create();
@@ -109,12 +97,12 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        toolbarTitle.setText(selectedContact.getFullname());
+        toolbarTitle.setText("Testperson");
         toolbarTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ChatActivity.this, ProfileActivity.class);
-                intent.putExtra("selectedContact", selectedContact);
+                //intent.putExtra("selectedContact", selectedContact);
                 startActivity(intent);
             }
         });
@@ -146,7 +134,7 @@ public class ChatActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menuChatProfil:
                 Intent intent = new Intent(ChatActivity.this, ProfileActivity.class);
-                intent.putExtra("selectedContact", selectedContact);
+              //  intent.putExtra("selectedContact", selectedContact);
                 startActivity(intent);
                 break;
         }
