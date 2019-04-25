@@ -14,13 +14,13 @@ import java.util.ArrayList;
 import at.htl_villach.chatapplication.R;
 import at.htl_villach.chatapplication.bll.User;
 
-public class ContactAdapter extends BaseAdapter {
+public class ChatListAdapter extends BaseAdapter {
     ArrayList<User> contacts;
     LayoutInflater inflater;
 
 
 
-    public ContactAdapter(Context applicationContext, ArrayList<User> contacts) {
+    public ChatListAdapter(Context applicationContext, ArrayList<User> contacts) {
         this.contacts = contacts;
         this.inflater = (LayoutInflater.from(applicationContext));
     }
@@ -43,13 +43,12 @@ public class ContactAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        view = inflater.inflate(R.layout.activity_list, null);
+        view = inflater.inflate(R.layout.activity_list_chats, null);
         TextView item = view.findViewById(R.id.txtName);
         TextView subitem = view.findViewById(R.id.txtLastChat);
 
 
         ImageView image = (ImageView) view.findViewById(R.id.profilePicture);
-        ImageButton btnBeginChat = view.findViewById(R.id.btnBeginChat);
 
         item.setText(contacts.get(i).getFullname());
 
@@ -59,12 +58,6 @@ public class ContactAdapter extends BaseAdapter {
             image.setImageResource(R.drawable.standard_picture);
         }
 
-        btnBeginChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
 
         //image.setImageResource(flags[i]);
         return view;

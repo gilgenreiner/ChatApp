@@ -23,14 +23,14 @@ import java.util.HashMap;
 
 import at.htl_villach.chatapplication.ProfileActivity;
 import at.htl_villach.chatapplication.R;
-import at.htl_villach.chatapplication.adapters.ContactAdapter;
+import at.htl_villach.chatapplication.adapters.ContactListAdapter;
 import at.htl_villach.chatapplication.bll.User;
 
 
 public class contacts extends Fragment {
     private ArrayList<User> arrUsers;
     private ArrayList<String> arrFriends;
-    private ContactAdapter adapter;
+    private ContactListAdapter adapter;
     private SwipeRefreshLayout srLayout;
     DatabaseReference database;
     FirebaseAuth firebaseAuth;
@@ -47,7 +47,7 @@ public class contacts extends Fragment {
         arrUsers = new ArrayList<User>();
         arrFriends = new ArrayList<>();
 
-        adapter = new ContactAdapter(getContext(), arrUsers);
+        adapter = new ContactListAdapter(getContext(), arrUsers);
 
         final ListView lvContacts = rootView.findViewById(R.id.lvContacts);
         srLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
