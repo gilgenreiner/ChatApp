@@ -101,7 +101,7 @@ public class ChatActivity extends AppCompatActivity {
                     image.setImageResource(selectedContact.getProfilePicture());
                 }
 
-                title.setText(selectedContact.getName());
+                title.setText(selectedContact.getFullname());
 
                 mBuilder.setView(mView);
                 AlertDialog dialog = mBuilder.create();
@@ -109,7 +109,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        toolbarTitle.setText(selectedContact.getName());
+        toolbarTitle.setText(selectedContact.getFullname());
         toolbarTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
