@@ -16,6 +16,7 @@ public class User implements Parcelable {
         this.id = null;
         this.email = null;
         this.username = null;
+        this.fullname = null;
         this.profilePictureResource = 0;
     }
 
@@ -32,6 +33,7 @@ public class User implements Parcelable {
         profilePictureResource = in.readInt();
         email = in.readString();
         username = in.readString();
+        fullname = in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -46,18 +48,6 @@ public class User implements Parcelable {
         }
     };
 
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) { this.username = username; }
-
-    public int getProfilePicture() {
-        return profilePictureResource;
-    }
-
-
     @Override
     public int describeContents() {
         return 0;
@@ -69,6 +59,17 @@ public class User implements Parcelable {
         dest.writeInt(profilePictureResource);
         dest.writeString(email);
         dest.writeString(username);
+        dest.writeString(fullname);
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) { this.username = username; }
+
+    public int getProfilePicture() {
+        return profilePictureResource;
     }
 
     public String getId() {
