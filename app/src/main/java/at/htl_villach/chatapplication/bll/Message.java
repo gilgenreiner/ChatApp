@@ -6,13 +6,13 @@ package at.htl_villach.chatapplication.bll;
 
 public class Message {
     private String sender;
-    private String chatId;
+    private String chatid;
     private String message;
     private String timestamp;
 
     public Message(String sender, String chatid, String message, String timestamp) {
         this.sender = sender;
-        this.chatId = chatid;
+        this.chatid = chatid;
         this.message = message;
         this.timestamp = timestamp;
     }
@@ -26,14 +26,6 @@ public class Message {
 
     public void setSender(String sender) {
         this.sender = sender;
-    }
-
-    public String getChatId() {
-        return chatId;
-    }
-
-    public void setChatId(String chatId) {
-        this.chatId = chatId;
     }
 
     public String getMessage() {
@@ -50,5 +42,13 @@ public class Message {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getChatid() {
+        return chatid;
+    }
+
+    public void setChatid(String chatid) {
+        this.chatid = chatid;
     }
 }

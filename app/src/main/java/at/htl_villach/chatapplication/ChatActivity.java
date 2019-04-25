@@ -15,11 +15,20 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import at.htl_villach.chatapplication.adapters.ChatAdapter;
 import at.htl_villach.chatapplication.bll.Chat;
@@ -30,9 +39,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private Chat currentChat;       //change to currentChat
+    private Chat currentChat ;
+    private User selectedUser;
 
-    private List<Message> mMessages = new ArrayList<Message>();
+    private List<Message> mMessages;
 
     //toolbar
     Toolbar toolbar;
@@ -47,7 +57,8 @@ public class ChatActivity extends AppCompatActivity {
 
     //Database
     FirebaseUser fuser;
-    //DatabaseReference reference;
+    DatabaseReference reference;
+    DatabaseReference referenceChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +67,29 @@ public class ChatActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         currentChat = (Chat) intent.getParcelableExtra("selectedChat");
+        fuser = FirebaseAuth.getInstance().getCurrentUser();
+        reference = FirebaseDatabase.getInstance().getReference("Users").child(currentChat.getReceiver(fuser.getUid()));
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                //get other User you are chatting with
+                selectedUser = snapshot.getValue(User.class);
+
+                //set Layouts with user data
+                toolbarTitle.setText(selectedUser.getFullname());
+                //toDo: Custom ProfilPicture
+                //if(selectedUser.getProfilePicture() != 0) {
+                //    toolbarPicture.setImageResource(selectedUser.getProfilePicture());
+                //}
+
+                readMesagges(currentChat.getId());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         toolbar = (Toolbar) findViewById(R.id.toolbar_chat);
         toolbarActionBack = (ImageView) findViewById(R.id.toolbar_back);
@@ -72,10 +106,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        //if(selectedContact.getProfilePicture() != 0) {
-        //    toolbarPicture.setImageResource(selectedContact.getProfilePicture());
-        //}
-
         toolbarPicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -85,11 +115,12 @@ public class ChatActivity extends AppCompatActivity {
                 ImageView image = (ImageView) mView.findViewById(R.id.dialog_profilePicture);
                 TextView title = (TextView) mView.findViewById(R.id.dialog_title);
 
-                //if(selectedContact.getProfilePicture() != 0) {
-                //    image.setImageResource(selectedContact.getProfilePicture());
+                //toDo: Custom ProfilPicture
+                //if(selectedUser.getProfilePicture() != 0) {
+                //    image.setImageResource(selectedUser.getProfilePicture());
                 //}
 
-                title.setText("TestPerson");
+                title.setText(selectedUser.getUsername());
 
                 mBuilder.setView(mView);
                 AlertDialog dialog = mBuilder.create();
@@ -97,12 +128,12 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        toolbarTitle.setText("Testperson");
+
         toolbarTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ChatActivity.this, ProfileActivity.class);
-                //intent.putExtra("selectedContact", selectedContact);
+                intent.putExtra("selectedContact", selectedUser);
                 startActivity(intent);
             }
         });
@@ -113,7 +144,14 @@ public class ChatActivity extends AppCompatActivity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               sendMessage("mkleinegger", "1", messageToSend.getText().toString());
+                String msg = messageToSend.getText().toString();
+
+                if (!msg.equals("")){
+                    sendMessage(fuser.getUid(), currentChat.getId(), msg);
+                } else {
+                    Toast.makeText(ChatActivity.this, "You can't send empty message", Toast.LENGTH_SHORT).show();
+                }
+                messageToSend.setText("");
             }
         });
 
@@ -134,7 +172,7 @@ public class ChatActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menuChatProfil:
                 Intent intent = new Intent(ChatActivity.this, ProfileActivity.class);
-              //  intent.putExtra("selectedContact", selectedContact);
+                intent.putExtra("selectedContact", selectedUser);
                 startActivity(intent);
                 break;
         }
@@ -143,10 +181,40 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendMessage(String sender, String chat_id, String message){
-        Message message1 = new Message(sender, chat_id, message, "12:20");
-        mMessages.add(message1);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
-        ChatAdapter chatAdapter = new ChatAdapter(ChatActivity.this, mMessages);
-        recyclerViewMessages.setAdapter(chatAdapter);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("sender", sender);
+        hashMap.put("chatid", chat_id);
+        hashMap.put("message", message);
+        hashMap.put("timestamp", String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())));
+
+        reference.child("Messages").push().setValue(hashMap);
+    }
+
+    private void readMesagges(final String chat_id){
+        mMessages = new ArrayList<Message>();
+
+        referenceChat = FirebaseDatabase.getInstance().getReference("Messages");
+        referenceChat.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mMessages.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Message message = snapshot.getValue(Message.class);
+                    if (message.getChatid().equals(chat_id)) {
+                        mMessages.add(message);
+                    }
+
+                    ChatAdapter chatAdapter = new ChatAdapter(ChatActivity.this, mMessages, selectedUser);
+                    recyclerViewMessages.setAdapter(chatAdapter);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

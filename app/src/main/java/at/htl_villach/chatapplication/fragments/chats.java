@@ -89,15 +89,15 @@ public class chats extends Fragment {
             public void onItemClick(AdapterView<?> adapter, View v, int position,
                                     long arg3)
             {
-                //User contact = (User)adapter.getItemAtPosition(position);
+                /*User contact = (User)adapter.getItemAtPosition(position);
                 HashMap<String, String> users = new HashMap<>();
                 users.put("4Hsy0jFb2oPqrG8uAySRIALj7kW2", "testuser1");
                 users.put("qdhpKvPejtSpMhOl1KXbj83AxtJ3", "testuser2");
-                Chat chat = new Chat("1", users);
+                Chat chat = new Chat("-LdImXp3AH8xMReF85SY", users);*/
+                Chat chat = (Chat)adapter.getItemAtPosition(position);
+
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
-
                 intent.putExtra("selectedChat", chat);
-
                 startActivity(intent);
 
             }

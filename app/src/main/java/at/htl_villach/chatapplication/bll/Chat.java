@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by pupil on 4/22/19.
@@ -13,6 +14,12 @@ import java.util.HashMap;
 public class Chat implements Parcelable {
 
     private String id;
+    private HashMap<String, String> users;
+
+    public Chat(String id, HashMap<String, String> users) {
+        this.id = id;
+        this.users = users;
+    }
 
     public String getId() {
         return id;
@@ -27,13 +34,6 @@ public class Chat implements Parcelable {
     }
 
     public void setUsers(HashMap<String, String> users) {
-        this.users = users;
-    }
-
-    private HashMap<String, String> users;
-
-    public Chat(String id, HashMap<String, String> users) {
-        this.id = id;
         this.users = users;
     }
 
@@ -65,4 +65,13 @@ public class Chat implements Parcelable {
         dest.writeMap(users);
     }
 
+    public String getReceiver(String uid) {
+        String result = "";
+        for (Map.Entry<String, String> entry : users.entrySet()) {
+            if(!uid.equals(entry.getKey())){
+                result = entry.getKey();
+            }
+        }
+        return result;
+    }
 }
