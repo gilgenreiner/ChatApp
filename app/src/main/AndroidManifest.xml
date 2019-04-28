@@ -22,6 +22,7 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".EditProfileActivity" />
+        <activity android:name=".popupDeleteDialogActivity" android:theme="@style/AppTheme.PopUpTheme"></activity>
     </application>
 
 </manifest>

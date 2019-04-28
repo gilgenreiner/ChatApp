@@ -24,4 +24,7 @@
     <string name="btnSaveEditedProfile">Save</string>
     <string name="btnCancel">Cancel</string>
     <string name="hint_chatmessage">Type a message...</string>
+    <string name="btnDelete">Delete</string>
+    <string name="confirm_delete_Profile">Confirm that you want to delete your profile</string>
+    <string name="emptyPasswordField">Password can not be empty</string>
 </resources>

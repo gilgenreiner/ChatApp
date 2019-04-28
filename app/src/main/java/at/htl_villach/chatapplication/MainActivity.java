@@ -8,8 +8,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -91,9 +95,11 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
                 else if(menuItem.getItemId() == R.id.mnDeleteProfile) {
+                    startActivity(new Intent(MainActivity.this, popupDeleteDialogActivity.class));
+
                     Toast.makeText(MainActivity.this, "Temporary toast for menuItem Delete!",
                             Toast.LENGTH_SHORT).show();
-                    return true;
+                    return true; //fragen
                 }
                 return false;
             }
