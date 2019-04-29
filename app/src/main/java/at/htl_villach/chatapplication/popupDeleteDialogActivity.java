@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -17,8 +18,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import at.htl_villach.chatapplication.bll.User;
 
 public class popupDeleteDialogActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
@@ -60,6 +67,9 @@ public class popupDeleteDialogActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         DatabaseReference drfUser = FirebaseDatabase.getInstance().getReference("Users").child(userId);
                                         drfUser.removeValue();
+
+                                        removeFromFriendsList();
+
                                         Toast.makeText(popupDeleteDialogActivity.this, "User account deleted!",
                                                 Toast.LENGTH_SHORT).show();
                                         Intent intent = new Intent(popupDeleteDialogActivity.this, LoginActivity.class);
@@ -83,6 +93,28 @@ public class popupDeleteDialogActivity extends AppCompatActivity {
 
 
         }
+    }
+
+    private void removeFromFriendsList() {
+        FirebaseDatabase.getInstance().getReference().child("Users")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
+                            User test = snapshot.getValue(User.class);
+                            snapshot.child("friends").hasChild(userId);
+                            Log.e("TEST", test.getFullname() +" ist befreundet mit "+ userId +": "+snapshot.child("friends").hasChild(userId));
+                            if(snapshot.child("friends").hasChild(userId)){
+                                DatabaseReference drfUser = FirebaseDatabase.getInstance().getReference("Users").child(test.getId()).child("friends").child(userId);
+                                drfUser.removeValue();
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
     }
 
 
