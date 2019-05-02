@@ -23,16 +23,17 @@
         app:civ_shadow_radius="10" />
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/txtEmail"
+        android:id="@+id/txtFullName"
         style="@style/TILStyle"
         android:layout_width="350dp"
         android:layout_height="60dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:hint="@string/hint_email">
+        android:hint="@string/hint_fullname">
 
         <android.support.design.widget.TextInputEditText
+            android:id="@+id/etxtFullName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
@@ -50,45 +51,14 @@
         android:hint="@string/hint_username">
 
         <android.support.design.widget.TextInputEditText
+            android:id="@+id/etxtUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
             android:textColor="@color/white" />
     </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/txtPassword"
-        style="@style/TILStyle"
-        android:layout_width="350dp"
-        android:layout_height="57dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:hint="@string/hint_password">
 
-        <android.support.design.widget.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:inputType="textPassword"
-            android:textColor="@color/white" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/txtRepeatPassword"
-        style="@style/TILStyle"
-        android:layout_width="350dp"
-        android:layout_height="56dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:hint="@string/hint_repeat_password">
-
-        <android.support.design.widget.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:inputType="textPassword"
-            android:textColor="@color/white" />
-    </android.support.design.widget.TextInputLayout>
 
 
     <LinearLayout
@@ -105,7 +75,8 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:text="@string/btnCancel"
-            android:theme="@style/ButtonStyle"/>
+            android:theme="@style/ButtonStyle"
+            android:onClick="onCancel"/>
 
         <Button
             android:id="@+id/btnSaveEditedProfile"
@@ -115,7 +86,8 @@
             android:layout_marginTop="8dp"
             android:layout_marginLeft="170dp"
             android:text="@string/btnSaveEditedProfile"
-            android:theme="@style/ButtonStyle" />
+            android:theme="@style/ButtonStyle"
+            android:onClick="saveProfile"/>
     </LinearLayout>
 
 
