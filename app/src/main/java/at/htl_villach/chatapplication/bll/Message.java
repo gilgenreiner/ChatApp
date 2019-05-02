@@ -8,9 +8,9 @@ public class Message {
     private String sender;
     private String chatid;
     private String message;
-    private String timestamp;
+    private Long timestamp;
 
-    public Message(String sender, String chatid, String message, String timestamp) {
+    public Message(String sender, String chatid, String message, Long timestamp) {
         this.sender = sender;
         this.chatid = chatid;
         this.message = message;
@@ -36,11 +36,11 @@ public class Message {
         this.message = message;
     }
 
-    public String getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 

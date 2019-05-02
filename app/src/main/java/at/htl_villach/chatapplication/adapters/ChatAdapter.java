@@ -1,6 +1,7 @@
 package at.htl_villach.chatapplication.adapters;
 
 import android.content.Context;
+import android.opengl.Visibility;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
@@ -30,8 +31,8 @@ import at.htl_villach.chatapplication.bll.User;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
-    public static  final int MSG_TYPE_LEFT = 0;
-    public static  final int MSG_TYPE_RIGHT = 1;
+    public static final int MSG_TYPE_LEFT = 0;
+    public static final int MSG_TYPE_RIGHT = 1;
 
     FirebaseUser fuser;
 
@@ -62,13 +63,25 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         Message message = mMessages.get(position);
 
         Calendar cal = Calendar.getInstance(Locale.GERMANY);
-        cal.setTimeInMillis(Long.parseLong(message.getTimestamp()) * 1000L);
+        cal.setTimeInMillis(message.getTimestamp() * 1000L);
         String date = DateFormat.format("hh:mm", cal).toString();
 
         holder.messageBody.setText(message.getMessage());
-        holder.sendFrom.setText(sender.getFullname());
         holder.timestamp.setText(date);
+        holder.sendFrom.setText(sender.getFullname());
 
+        if(holder.getItemViewType() == MSG_TYPE_RIGHT) {
+            holder.sendFrom.setVisibility(View.GONE);
+        } else if(holder.getItemViewType() == MSG_TYPE_LEFT){
+            if((position - 1) < 0) {
+                holder.sendFrom.setVisibility(View.VISIBLE);
+            }
+            else if(mMessages.get(position - 1).getSender().equals(sender.getId())) {
+                holder.sendFrom.setVisibility(View.GONE);
+            }else {
+                holder.sendFrom.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     @Override
@@ -94,7 +107,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @Override
     public int getItemViewType(int position) {
         fuser = FirebaseAuth.getInstance().getCurrentUser();
-        if (mMessages.get(position).getSender().equals(fuser.getUid())){
+        if (mMessages.get(position).getSender().equals(fuser.getUid())) {
             return MSG_TYPE_RIGHT;
         } else {
             return MSG_TYPE_LEFT;
