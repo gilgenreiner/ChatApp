@@ -14,11 +14,13 @@ import java.util.Map;
 public class Chat implements Parcelable {
 
     private String id;
+    private Boolean isGroupChat;
     private HashMap<String, String> users;
 
-    public Chat(String id, HashMap<String, String> users) {
+    public Chat(String id, HashMap<String, String> users, Boolean isGroupChat) {
         this.id = id;
         this.users = users;
+        this.isGroupChat = isGroupChat;
     }
 
     public String getId() {

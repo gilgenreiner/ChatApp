@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "310412688302-3vuniidko7or2l41dn5aunljfii3mr5v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "at.htl_villach.chatapplication",
+            "certificate_hash": "5201a7388f52eb17f77ee332d85498949e16e456"
+          }
+        },
+        {
           "client_id": "310412688302-aoudc9vc5qia8sgc4u0uck3b2mk70noj.apps.googleusercontent.com",
           "client_type": 3
         }

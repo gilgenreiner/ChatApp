@@ -1,6 +1,8 @@
 package at.htl_villach.chatapplication.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +11,15 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import at.htl_villach.chatapplication.R;
 import at.htl_villach.chatapplication.bll.Chat;
@@ -19,6 +29,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ChatListAdapter extends BaseAdapter {
     ArrayList<Chat> contacts;
     LayoutInflater inflater;
+    DatabaseReference database;
+    FirebaseAuth firebaseAuth;
 
 
 
@@ -46,13 +58,48 @@ public class ChatListAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         view = inflater.inflate(R.layout.activity_list_chats, null);
-        TextView item = view.findViewById(R.id.txtName);
+        final TextView item = view.findViewById(R.id.txtName);
         TextView subitem = view.findViewById(R.id.txtLastChat);
 
 
         CircleImageView image = (CircleImageView) view.findViewById(R.id.list_picture);
+        firebaseAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance().getReference("Users");
 
-        item.setText(contacts.get(i).getId());
+        HashMap<String, String> users = contacts.get(i).getUsers();
+        String userToLookup = "";
+        for(String key : users.keySet()) {
+            if(!firebaseAuth.getCurrentUser().getUid().equals(key)) {
+                userToLookup = key;
+            }
+        }
+        if(!TextUtils.isEmpty(userToLookup)) {
+            database.orderByChild("id")
+                    .equalTo(userToLookup)
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            HashMap<String, HashMap<String,String>> user = (HashMap<String,HashMap<String,String>>) dataSnapshot.getValue();
+                            if(user != null) {
+                                final User userObject = new User();
+                                for (String key : user.keySet()) {
+                                    userObject.setUsername(user.get(key).get("username"));
+                                    userObject.setFullname(user.get(key).get("fullname"));
+                                    userObject.setEmail(user.get(key).get("email"));
+                                    userObject.setId(user.get(key).get("id"));
+                                }
+                                item.setText(userObject.getFullname());
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+        }
+
 
         //subitem.setText(contacts.get(i).getUsername());
 

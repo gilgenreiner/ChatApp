@@ -85,7 +85,6 @@ public class ContactListAdapter extends BaseAdapter {
         imageNewChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(test.getContext(), "new Chat clicked", Toast.LENGTH_SHORT).show();
                 database.orderByChild("id")
                         .addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -105,7 +104,7 @@ public class ContactListAdapter extends BaseAdapter {
                                     }
 
                                     if(foundChat != null) {
-                                        Chat chatObject = new Chat((String) foundChat.get("id"), (HashMap<String, String>)foundChat.get("users"));
+                                        Chat chatObject = new Chat((String) foundChat.get("id"), (HashMap<String, String>)foundChat.get("users"), (Boolean) foundChat.get("isGroupChat"));
                                         Intent intent = new Intent(innerView.getContext(), ChatActivity.class);
                                         intent.putExtra("selectedChat", chatObject);
                                         innerView.getContext().startActivity(intent);
@@ -119,10 +118,11 @@ public class ContactListAdapter extends BaseAdapter {
                                                 userPair.put(currUser.getUid(), "true");
                                                 userPair.put(thisUser.getId(), "true");
                                                 newChat.put("id", id);
+                                                newChat.put("isGroupChat", false);
                                                 newChat.put("users", userPair);
 
                                                 final Intent intent = new Intent(innerView.getContext(), ChatActivity.class);
-                                                intent.putExtra("selectedChat", new Chat(id, userPair));
+                                                intent.putExtra("selectedChat", new Chat(id, userPair, false));
 
                                                 database.child(id).setValue(newChat)
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {

@@ -5,7 +5,12 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.Layout;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -35,6 +40,7 @@ public class chats extends Fragment {
     private ChatListAdapter adapter;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference database;
+    private SwipeRefreshLayout srLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,46 +48,26 @@ public class chats extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_chats, container, false);
         arrChats = new ArrayList<>();
 
+        srLayout = rootView.findViewById(R.id.srLayout);
+
         adapter = new ChatListAdapter(getContext(), arrChats);
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("Chats");
 
         final ListView lvChats = rootView.findViewById(R.id.lvChats);
+        registerForContextMenu(lvChats);
         lvChats.setAdapter(adapter);
 
-        database.orderByChild("id")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        ArrayList<Chat> tempChat = new ArrayList<>();
-                        HashMap<String, Object> chats = (HashMap<String,Object>) dataSnapshot.getValue();
-                        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-                        if(chats != null) {
-                            for(String key : chats.keySet()) {
-                                HashMap<String, Object> curObj = (HashMap<String, Object>) chats.get(key);
-                                HashMap<String, String> userPair = (HashMap<String, String>) curObj.get("users");
-                                if(userPair.containsKey(currentUser.getUid())) {
-                                    tempChat.add(new Chat(key, userPair));
-                                }
-                            }
+        if(!srLayout.isRefreshing()) {
+            RefreshList();
+        }
 
-                            if(!tempChat.isEmpty()) {
-                                arrChats.clear();
-                                arrChats.addAll(tempChat);
-                                adapter.notifyDataSetChanged();
-                            }
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-
-        //insertTestData();
-
+        srLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getChatsFromDatabase();
+            }
+        });
 
         lvChats.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
@@ -89,11 +75,6 @@ public class chats extends Fragment {
             public void onItemClick(AdapterView<?> adapter, View v, int position,
                                     long arg3)
             {
-                /*User contact = (User)adapter.getItemAtPosition(position);
-                HashMap<String, String> users = new HashMap<>();
-                users.put("4Hsy0jFb2oPqrG8uAySRIALj7kW2", "testuser1");
-                users.put("qdhpKvPejtSpMhOl1KXbj83AxtJ3", "testuser2");
-                Chat chat = new Chat("-LdImXp3AH8xMReF85SY", users);*/
                 Chat chat = (Chat)adapter.getItemAtPosition(position);
 
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
@@ -107,24 +88,86 @@ public class chats extends Fragment {
 
     }
 
-    private void insertTestData() {
-        /*arrUsers.add(new User("Max Mustermann1", "mustermann@gmail.com","muster373"));
-        arrUsers.add(new User("Max Mustermann2", "mustermann@gmail.com", "muster333"));
-        arrUsers.add(new User("Max Mustermann3", "mustermann@gmail.com", "muster3563"));
-        arrUsers.add(new User("Max Mustermann4", "mustermann@gmail.com", "muster3452"));
-        arrUsers.add(new User("Max Mustermann5", "mustermann@gmail.com", "muster3766"));
-        arrUsers.add(new User("Max Mustermann6", "mustermann@gmail.com", "muster3235463"));
-        arrUsers.add(new User("Max Mustermann7", "mustermann@gmail.com", "muster37765"));
+    public void RefreshList() {
+        srLayout.setRefreshing(true);
+        getChatsFromDatabase();
+    }
 
-        arrLastMessage.add("Hallo1");
-        arrLastMessage.add("Hallo2");
-        arrLastMessage.add("Hallo3");
-        arrLastMessage.add("Hallo4");
-        arrLastMessage.add("Hallo5");
-        arrLastMessage.add("Hallo6");
-        arrLastMessage.add("Hallo7");
-        adapter.notifyDataSetChanged();*/
+    private void getChatsFromDatabase(){
+        database.orderByChild("id")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        ArrayList<Chat> tempChat = new ArrayList<>();
+                        HashMap<String, Object> chats = (HashMap<String,Object>) dataSnapshot.getValue();
+                        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+                        if(chats != null) {
+                            for(String key : chats.keySet()) {
+                                HashMap<String, Object> curObj = (HashMap<String, Object>) chats.get(key);
+                                HashMap<String, String> userPair = (HashMap<String, String>) curObj.get("users");
+                                Boolean isGroupChat = (Boolean) curObj.get("isGroupChat");
+                                if(userPair.containsKey(currentUser.getUid())) {
+                                    tempChat.add(new Chat(key, userPair, isGroupChat));
+                                }
+                            }
+
+                            if(!tempChat.isEmpty()) {
+                                arrChats.clear();
+                                arrChats.addAll(tempChat);
+                                adapter.notifyDataSetChanged();
+                            }
+                        }
+
+                        srLayout.setRefreshing(false);
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
 
     }
 
+    private void deleteChat(Chat chat) {
+        database.orderByChild("id")
+                .equalTo(chat.getId())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for(DataSnapshot toDelete : dataSnapshot.getChildren()) {
+                            toDelete.getRef().removeValue();
+                        }
+                        RefreshList();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if(v.getId()==R.id.lvChats) {
+            getActivity().getMenuInflater().inflate(R.menu.menu_list, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.mnDeleteItem:
+                AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                Chat chat = (Chat) adapter.getItem(acmi.position);
+                deleteChat(chat);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+
+    }
 }

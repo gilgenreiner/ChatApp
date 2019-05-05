@@ -27,4 +27,6 @@
     <string name="confirm_delete_Profile">Confirm that you want to delete your profile</string>
     <string name="emptyPasswordField">Password can not be empty</string>
     <string name="emptyMessage">You cant send empty message</string>
+    <string name="menu_delete">Delete</string>
+    <string name="add_group">Add Group</string>
 </resources>

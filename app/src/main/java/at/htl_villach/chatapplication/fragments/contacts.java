@@ -60,7 +60,9 @@ public class contacts extends Fragment {
 
         lvContacts.setAdapter(adapter);
 
-        getFriendsFromDatabase();
+        if(!srLayout.isRefreshing()) {
+            RefreshList();
+        }
 
         lvContacts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -135,18 +137,6 @@ public class contacts extends Fragment {
     }
 
 
-    private void insertTestData() {
-        arrUsers.add(new User("Max Mustermann1", "mustermann@gmail.com", "muster373"));
-        arrUsers.add(new User("Max Mustermann2", "mustermann@gmail.com", "muster333"));
-        arrUsers.add(new User("Max Mustermann3", "mustermann@gmail.com", "muster3563"));
-        arrUsers.add(new User("Max Mustermann4", "mustermann@gmail.com", "muster3452"));
-        arrUsers.add(new User("Max Mustermann5", "mustermann@gmail.com", "muster3766"));
-        arrUsers.add(new User("Max Mustermann6", "mustermann@gmail.com", "muster3235463"));
-        arrUsers.add(new User("Max Mustermann7", "mustermann@gmail.com", "muster37765"));
 
-
-        adapter.notifyDataSetChanged();
-
-    }
 
 }
