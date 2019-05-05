@@ -28,16 +28,4 @@
         android:layout_alignParentRight="true"
         android:text="Placeholder message"/>
 
-    <TextView
-        android:id="@+id/message_timestamp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/message_body"
-        android:layout_marginEnd="13dp"
-        android:elevation="2dp"
-        android:paddingHorizontal="16dp"
-        android:text="12:45"
-        android:textSize="10dp" />
-
 </RelativeLayout>

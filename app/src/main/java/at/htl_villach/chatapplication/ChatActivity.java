@@ -1,18 +1,28 @@
 package at.htl_villach.chatapplication;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +63,7 @@ public class ChatActivity extends AppCompatActivity {
     ImageButton btnSend;
     RecyclerView recyclerViewMessages;
     ChatAdapter chatAdapter;
+    SwipeController swipeController;
     LinearLayoutManager linearLayoutManager;
 
     //Database
@@ -101,12 +112,8 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        toolbarPicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //toDo profilpicture pop up dialog
-            }
-        });
+        //toDo: loadProfilPicture
+        //toolbarPicture.setImageResource();
 
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,6 +137,7 @@ public class ChatActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(ChatActivity.this, R.string.emptyMessage, Toast.LENGTH_SHORT).show();
                 }
+
                 messageToSend.setText("");
             }
         });
@@ -141,6 +149,16 @@ public class ChatActivity extends AppCompatActivity {
         recyclerViewMessages.setLayoutManager(linearLayoutManager);
 
         readMessages(currentChat.getId());
+
+        swipeController = new SwipeController();
+        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
+        itemTouchhelper.attachToRecyclerView(recyclerViewMessages);
+        recyclerViewMessages.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                swipeController.onDraw(c, chatAdapter);
+            }
+        });
     }
 
     @Override
@@ -164,13 +182,15 @@ public class ChatActivity extends AppCompatActivity {
 
     private void sendMessage(String chatId, String sender, String message){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        String messageId = reference.child("Messages").child(chatId).push().getKey();
 
         HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("id", messageId);
         hashMap.put("sender", sender);
         hashMap.put("message", message);
         hashMap.put("timestamp", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
-        reference.child("Messages").child(chatId).push().setValue(hashMap);
+        reference.child("Messages").child(chatId).child(messageId).setValue(hashMap);
     }
 
     private void readMessages(final String chat_id){

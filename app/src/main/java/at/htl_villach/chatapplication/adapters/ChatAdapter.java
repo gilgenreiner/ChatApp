@@ -1,7 +1,6 @@
 package at.htl_villach.chatapplication.adapters;
 
 import android.content.Context;
-import android.opengl.Visibility;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
@@ -12,10 +11,6 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
 import java.util.List;
@@ -51,10 +46,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public ChatAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == MSG_TYPE_RIGHT) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.my_message, parent, false);
-            return new ChatAdapter.ViewHolder(view);
+            return new ViewHolder(view);
         } else {
             View view = LayoutInflater.from(mContext).inflate(R.layout.their_message, parent, false);
-            return new ChatAdapter.ViewHolder(view);
+            return new ViewHolder(view);
         }
     }
 
@@ -62,17 +57,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) {
         Message message = mMessages.get(position);
 
-        Calendar cal = Calendar.getInstance(Locale.GERMANY);
-        cal.setTimeInMillis(message.getTimestamp() * 1000L);
-        String date = DateFormat.format("hh:mm", cal).toString();
-
         holder.messageBody.setText(message.getMessage());
-        holder.timestamp.setText(date);
         holder.sendFrom.setText(sender.getFullname());
 
-        if(holder.getItemViewType() == MSG_TYPE_RIGHT) {
-            holder.sendFrom.setVisibility(View.GONE);
-        } else if(holder.getItemViewType() == MSG_TYPE_LEFT){
+        if(holder.getItemViewType() == MSG_TYPE_LEFT){
             if((position - 1) < 0) {
                 holder.sendFrom.setVisibility(View.VISIBLE);
             }
@@ -84,6 +72,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
     }
 
+    public Message getMessage(int position) {
+        return mMessages.get(position);
+    }
+
     @Override
     public int getItemCount() {
         return mMessages.size();
@@ -93,14 +85,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
         public TextView messageBody;
         public TextView sendFrom;
-        public TextView timestamp;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             messageBody = itemView.findViewById(R.id.message_body);
             sendFrom = itemView.findViewById(R.id.message_username);
-            timestamp = itemView.findViewById(R.id.message_timestamp);
         }
     }
 
@@ -113,4 +103,5 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             return MSG_TYPE_LEFT;
         }
     }
+
 }
