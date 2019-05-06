@@ -104,7 +104,7 @@ public class ContactListAdapter extends BaseAdapter {
                                     }
 
                                     if(foundChat != null) {
-                                        Chat chatObject = new Chat((String) foundChat.get("id"), (HashMap<String, String>)foundChat.get("users"), (Boolean) foundChat.get("isGroupChat"));
+                                        Chat chatObject = new Chat((String) foundChat.get("id"), (HashMap<String, Boolean>)foundChat.get("users"), (Boolean) foundChat.get("isGroupChat"));
                                         Intent intent = new Intent(innerView.getContext(), ChatActivity.class);
                                         intent.putExtra("selectedChat", chatObject);
                                         innerView.getContext().startActivity(intent);
@@ -114,9 +114,9 @@ public class ContactListAdapter extends BaseAdapter {
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 String id = dataSnapshot.getKey();
                                                 HashMap<String, Object> newChat = new HashMap<>();
-                                                HashMap<String, String> userPair = new HashMap<>();
-                                                userPair.put(currUser.getUid(), "true");
-                                                userPair.put(thisUser.getId(), "true");
+                                                HashMap<String, Boolean> userPair = new HashMap<>();
+                                                userPair.put(currUser.getUid(), true);
+                                                userPair.put(thisUser.getId(), true);
                                                 newChat.put("id", id);
                                                 newChat.put("isGroupChat", false);
                                                 newChat.put("users", userPair);

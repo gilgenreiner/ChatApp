@@ -104,7 +104,7 @@ public class chats extends Fragment {
                         if(chats != null) {
                             for(String key : chats.keySet()) {
                                 HashMap<String, Object> curObj = (HashMap<String, Object>) chats.get(key);
-                                HashMap<String, String> userPair = (HashMap<String, String>) curObj.get("users");
+                                HashMap<String, Boolean> userPair = (HashMap<String, Boolean>) curObj.get("users");
                                 Boolean isGroupChat = (Boolean) curObj.get("isGroupChat");
                                 if(userPair.containsKey(currentUser.getUid())) {
                                     tempChat.add(new Chat(key, userPair, isGroupChat));

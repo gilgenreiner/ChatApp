@@ -89,11 +89,11 @@ public class AddUserActivity extends AppCompatActivity {
                                                     .addValueEventListener(new ValueEventListener() {
                                                         @Override
                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                            HashMap<String, String> friends = (HashMap<String, String>) dataSnapshot.getValue();
+                                                            HashMap<String, Boolean> friends = (HashMap<String, Boolean>) dataSnapshot.getValue();
                                                             boolean alreadyAdded = false;
                                                             if (friends != null) {
                                                                 for (String key : friends.keySet()) {
-                                                                    if (friends.get(key).equals(userObject.getUsername())) {
+                                                                    if (key.equals(userObject.getId())) {
                                                                         alreadyAdded = true;
                                                                     }
                                                                 }
@@ -147,7 +147,7 @@ public class AddUserActivity extends AppCompatActivity {
             public void onClick(View v) {
                 DatabaseReference ref = database.child(firebaseAuth.getCurrentUser().getUid()).child("friends");
                 HashMap<String, Object> newFriend = new HashMap<>();
-                newFriend.put(userFound.getId(), userFound.getUsername());
+                newFriend.put(userFound.getId(), true);
                 ref.updateChildren(newFriend)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

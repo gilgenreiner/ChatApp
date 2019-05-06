@@ -96,9 +96,9 @@ public class contacts extends Fragment {
                         if(friend != null) {
                             arrUsers.clear();
                             for (String key : friend.keySet()) {
-                                String username = friend.get(key);
-                                database.orderByChild("username")
-                                        .equalTo(username)
+
+                                database.orderByChild("id")
+                                        .equalTo(key)
                                         .addValueEventListener(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

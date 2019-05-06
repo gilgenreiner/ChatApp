@@ -66,7 +66,7 @@ public class ChatListAdapter extends BaseAdapter {
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("Users");
 
-        HashMap<String, String> users = contacts.get(i).getUsers();
+        HashMap<String, Boolean> users = contacts.get(i).getUsers();
         String userToLookup = "";
         for(String key : users.keySet()) {
             if(!firebaseAuth.getCurrentUser().getUid().equals(key)) {

@@ -14,10 +14,13 @@ import java.util.Map;
 public class Chat implements Parcelable {
 
     private String id;
-    private Boolean isGroupChat;
-    private HashMap<String, String> users;
 
-    public Chat(String id, HashMap<String, String> users, Boolean isGroupChat) {
+
+
+    private Boolean isGroupChat;
+    private HashMap<String, Boolean> users;
+
+    public Chat(String id, HashMap<String, Boolean> users, Boolean isGroupChat) {
         this.id = id;
         this.users = users;
         this.isGroupChat = isGroupChat;
@@ -31,17 +34,27 @@ public class Chat implements Parcelable {
         this.id = id;
     }
 
-    public HashMap<String, String> getUsers() {
+    public HashMap<String, Boolean> getUsers() {
         return users;
     }
 
-    public void setUsers(HashMap<String, String> users) {
+    public void setUsers(HashMap<String, Boolean> users) {
         this.users = users;
+    }
+
+    public Boolean getGroupChat() {
+        return isGroupChat;
+    }
+
+    public void setGroupChat(Boolean groupChat) {
+        isGroupChat = groupChat;
     }
 
     protected Chat(Parcel in) {
         id = in.readString();
+        isGroupChat = in.readByte() != 0;
         users = in.readHashMap(String.class.getClassLoader());
+
     }
 
     public static final Creator<Chat> CREATOR = new Creator<Chat>() {
@@ -64,12 +77,13 @@ public class Chat implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
+        dest.writeByte((byte) (isGroupChat ? 1 : 0));
         dest.writeMap(users);
     }
 
     public String getReceiver(String uid) {
         String result = "";
-        for (Map.Entry<String, String> entry : users.entrySet()) {
+        for (Map.Entry<String, Boolean> entry : users.entrySet()) {
             if(!uid.equals(entry.getKey())){
                 result = entry.getKey();
             }

@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     DatabaseReference database;
     DatabaseReference database2;
+    DatabaseReference database3;
     ArrayList<User> arrUsers;
     SelectListAdapter slAdapter;
 
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("Users");
         database2 = FirebaseDatabase.getInstance().getReference("Chats");
+        database3 = FirebaseDatabase.getInstance().getReference("Groups");
         //tbMain.setTabGravity(TabLayout.GRAVITY_FILL);
 
         arrUsers = new ArrayList<>();
@@ -162,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                final DialogInterface fdialog = dialog;
                 Boolean[] checked = slAdapter.getChecked();
                 final ArrayList<User> selectedUsers = new ArrayList<>();
                 for(int i=0; i<checked.length; i++) {
@@ -174,29 +178,20 @@ public class MainActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                         String id = dataSnapshot.getKey();
-                        HashMap<String, Object> newChat = new HashMap<>();
-                        HashMap<String, String> users = new HashMap<>();
-                        users.put(firebaseAuth.getCurrentUser().getUid(), "true");
+                        HashMap<String, Boolean> users = new HashMap<>();
+                        users.put(firebaseAuth.getCurrentUser().getUid(), true);
                         for(User u : selectedUsers) {
-                            users.put(u.getId(), "true");
+                            users.put(u.getId(), true);
                         }
 
-                        newChat.put("id", id);
-                        newChat.put("isGroupChat", true);
-                        newChat.put("users", users);
 
-                        final Intent intent = new Intent(MainActivity.this, GroupChatActivity.class);
-                        intent.putExtra("newGroupChat", new Chat(id, users, true));
+                        final Chat newChatObject = new Chat(id, users, true);
 
-                        database2.child(id).setValue(newChat)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if(task.isSuccessful()) {
-                                            startActivity(intent);
-                                        }
-                                    }
-                                });
+
+                        fdialog.dismiss();
+                        createGroupNameDialog(newChatObject);
+
+
                     }
 
                     @Override
@@ -244,6 +239,60 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
+
+    private void createGroupNameDialog(Chat newChat) {
+        final Chat fNewChat = newChat;
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Choose Group Name");
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        final EditText input = new EditText(MainActivity.this);
+        input.setHint("Group Name");
+        input.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
+        builder.setView(input);
+        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final Intent intent = new Intent(MainActivity.this, GroupChatActivity.class);
+                intent.putExtra("newGroupChat", fNewChat);
+
+                final HashMap<String, Object> writeNewChat = new HashMap<>();
+                writeNewChat.put("id", fNewChat.getId());
+                writeNewChat.put("isGroupChat", fNewChat.getGroupChat());
+                writeNewChat.put("users", fNewChat.getUsers());
+
+                final HashMap<String, Object> writeNewGroup = new HashMap<>();
+                writeNewGroup.put("title", input.getText().toString());
+                writeNewGroup.put("picture", null);
+
+                database3.child(fNewChat.getId()).setValue(writeNewGroup)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                database2.child(fNewChat.getId()).setValue(writeNewChat)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful()) {
+                                                    startActivity(intent);
+                                                }
+                                            }
+                                        });
+                            }
+                        });
+
+            }
+        });
+        builder.show();
+
+    }
+
     private void getFriendsFromDatabase() {
         database.child(firebaseAuth.getCurrentUser().getUid()).child("friends")
                 .addValueEventListener(new ValueEventListener() {
@@ -253,9 +302,9 @@ public class MainActivity extends AppCompatActivity {
                         if(friend != null) {
                             arrUsers.clear();
                             for (String key : friend.keySet()) {
-                                String username = friend.get(key);
-                                database.orderByChild("username")
-                                        .equalTo(username)
+
+                                database.orderByChild("id")
+                                        .equalTo(key)
                                         .addValueEventListener(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
