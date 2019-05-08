@@ -38,8 +38,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
+                android:paddingTop="10dp"
                 android:text="@string/txtName"
-                android:textColor="@color/white"
                 android:textStyle="bold" />
 
             <TextView
@@ -48,8 +48,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="2"
+                android:gravity = "center_vertical|left|start"
                 android:text="@string/txtLastChat"
-                android:textColor="@color/white"
                 android:textSize="12dp" />
         </LinearLayout>
 

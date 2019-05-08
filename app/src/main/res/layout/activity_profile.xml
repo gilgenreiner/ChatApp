@@ -5,16 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ProfileActivity"
-    android:background="@color/dark_gray">
+    tools:context=".ProfileActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolProfile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/green"
         android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme" />
+        app:titleTextAppearance="@style/ToolbarTextAppearance.Title"
+        app:subtitleTextAppearance="@style/ToolbarTextAppearance.Subtitle"
+        style="@style/MyToolbar" />
 
     <ImageView
         android:id="@+id/profilePicture"
@@ -29,7 +29,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/profile_name"
-        android:textColor="@color/white"
         android:paddingLeft="20dp"
         android:textSize="20dp"/>
 
@@ -38,8 +37,7 @@
         android:id="@+id/txtName"
         android:layout_width="match_parent"
         android:layout_height="34dp"
-        android:paddingLeft="40dp"
-        android:textColor="@color/white" />
+        android:paddingLeft="40dp" />
 
     <Space
         android:layout_width="match_parent"
@@ -49,7 +47,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/profile_username"
-        android:textColor="@color/white"
         android:paddingLeft="20dp"
         android:textSize="20dp"
         />
@@ -58,6 +55,5 @@
         android:id="@+id/txtFullName"
         android:layout_width="match_parent"
         android:layout_height="34dp"
-        android:paddingLeft="40dp"
-        android:textColor="@color/white" />
+        android:paddingLeft="40dp" />
 </LinearLayout>

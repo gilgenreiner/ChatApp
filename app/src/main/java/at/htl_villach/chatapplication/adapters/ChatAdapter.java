@@ -1,12 +1,14 @@
 package at.htl_villach.chatapplication.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -54,19 +56,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final @NonNull ChatAdapter.ViewHolder holder, int position) {
         Message message = mMessages.get(position);
 
         holder.messageBody.setText(message.getMessage());
         holder.sendFrom.setText(sender.getFullname());
 
-        if(holder.getItemViewType() == MSG_TYPE_LEFT){
-            if((position - 1) < 0) {
+        if (holder.getItemViewType() == MSG_TYPE_LEFT) {
+            if ((position - 1) < 0) {
                 holder.sendFrom.setVisibility(View.VISIBLE);
-            }
-            else if(mMessages.get(position - 1).getSender().equals(sender.getId())) {
+            } else if (mMessages.get(position - 1).getSender().equals(sender.getId())) {
                 holder.sendFrom.setVisibility(View.GONE);
-            }else {
+            } else {
                 holder.sendFrom.setVisibility(View.VISIBLE);
             }
         }
@@ -83,12 +84,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
+        public RelativeLayout layout;
         public TextView messageBody;
         public TextView sendFrom;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
+            layout = itemView.findViewById(R.id.message_layout);
             messageBody = itemView.findViewById(R.id.message_body);
             sendFrom = itemView.findViewById(R.id.message_username);
         }
@@ -103,5 +106,4 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             return MSG_TYPE_LEFT;
         }
     }
-
 }
