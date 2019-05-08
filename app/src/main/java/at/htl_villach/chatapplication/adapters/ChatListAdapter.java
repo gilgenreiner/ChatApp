@@ -30,6 +30,7 @@ public class ChatListAdapter extends BaseAdapter {
     ArrayList<Chat> contacts;
     LayoutInflater inflater;
     DatabaseReference database;
+    DatabaseReference database2;
     FirebaseAuth firebaseAuth;
 
 
@@ -61,36 +62,21 @@ public class ChatListAdapter extends BaseAdapter {
         final TextView item = view.findViewById(R.id.txtName);
         TextView subitem = view.findViewById(R.id.txtLastChat);
 
-
         CircleImageView image = (CircleImageView) view.findViewById(R.id.list_picture);
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("Users");
+        database2 = FirebaseDatabase.getInstance().getReference("Groups");
 
-        HashMap<String, Boolean> users = contacts.get(i).getUsers();
-        String userToLookup = "";
-        for(String key : users.keySet()) {
-            if(!firebaseAuth.getCurrentUser().getUid().equals(key)) {
-                userToLookup = key;
-            }
-        }
-        if(!TextUtils.isEmpty(userToLookup)) {
-            database.orderByChild("id")
-                    .equalTo(userToLookup)
+        if(contacts.get(i).getGroupChat()) {
+            database2.child(contacts.get(i).getId())
                     .addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            HashMap<String, HashMap<String,String>> user = (HashMap<String,HashMap<String,String>>) dataSnapshot.getValue();
-                            if(user != null) {
-                                final User userObject = new User();
-                                for (String key : user.keySet()) {
-                                    userObject.setUsername(user.get(key).get("username"));
-                                    userObject.setFullname(user.get(key).get("fullname"));
-                                    userObject.setEmail(user.get(key).get("email"));
-                                    userObject.setId(user.get(key).get("id"));
-                                }
-                                item.setText(userObject.getFullname());
+                            HashMap<String, String> group = (HashMap<String, String>) dataSnapshot.getValue();
+                            if(group != null) {
+                                String title = group.get("title");
+                                item.setText(title);
                             }
-
                         }
 
                         @Override
@@ -98,7 +84,42 @@ public class ChatListAdapter extends BaseAdapter {
 
                         }
                     });
+        } else {
+            HashMap<String, Boolean> users = contacts.get(i).getUsers();
+            String userToLookup = "";
+            for(String key : users.keySet()) {
+                if(!firebaseAuth.getCurrentUser().getUid().equals(key)) {
+                    userToLookup = key;
+                }
+            }
+            if(!TextUtils.isEmpty(userToLookup)) {
+                database.orderByChild("id")
+                        .equalTo(userToLookup)
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                HashMap<String, HashMap<String,String>> user = (HashMap<String,HashMap<String,String>>) dataSnapshot.getValue();
+                                if(user != null) {
+                                    final User userObject = new User();
+                                    for (String key : user.keySet()) {
+                                        userObject.setUsername(user.get(key).get("username"));
+                                        userObject.setFullname(user.get(key).get("fullname"));
+                                        userObject.setEmail(user.get(key).get("email"));
+                                        userObject.setId(user.get(key).get("id"));
+                                    }
+                                    item.setText(userObject.getFullname());
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+            }
         }
+
 
 
         //subitem.setText(contacts.get(i).getUsername());

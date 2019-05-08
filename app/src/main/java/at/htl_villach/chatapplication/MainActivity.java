@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 final Intent intent = new Intent(MainActivity.this, GroupChatActivity.class);
-                intent.putExtra("newGroupChat", fNewChat);
+                intent.putExtra("selectedChat", fNewChat);
 
                 final HashMap<String, Object> writeNewChat = new HashMap<>();
                 writeNewChat.put("id", fNewChat.getId());

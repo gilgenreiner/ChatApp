@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import at.htl_villach.chatapplication.ChatActivity;
+import at.htl_villach.chatapplication.GroupChatActivity;
 import at.htl_villach.chatapplication.R;
 import at.htl_villach.chatapplication.adapters.ChatListAdapter;
 import at.htl_villach.chatapplication.adapters.ContactListAdapter;
@@ -76,8 +77,13 @@ public class chats extends Fragment {
                                     long arg3)
             {
                 Chat chat = (Chat)adapter.getItemAtPosition(position);
+                Intent intent;
+                if(chat.getGroupChat()) {
+                    intent = new Intent(getActivity(), GroupChatActivity.class);
 
-                Intent intent = new Intent(getActivity(), ChatActivity.class);
+                } else {
+                    intent = new Intent(getActivity(), ChatActivity.class);
+                }
                 intent.putExtra("selectedChat", chat);
                 startActivity(intent);
 
