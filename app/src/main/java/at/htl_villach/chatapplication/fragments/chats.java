@@ -41,6 +41,7 @@ public class chats extends Fragment {
     private ChatListAdapter adapter;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference database;
+    private DatabaseReference database2;
     private SwipeRefreshLayout srLayout;
 
     @Override
@@ -54,6 +55,7 @@ public class chats extends Fragment {
         adapter = new ChatListAdapter(getContext(), arrChats);
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("Chats");
+        database2 = FirebaseDatabase.getInstance().getReference("Groups");
 
         final ListView lvChats = rootView.findViewById(R.id.lvChats);
         registerForContextMenu(lvChats);
@@ -146,6 +148,20 @@ public class chats extends Fragment {
                             toDelete.getRef().removeValue();
                         }
                         RefreshList();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+        database2.child(chat.getId())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for(DataSnapshot toDelete : dataSnapshot.getChildren()) {
+                            toDelete.getRef().removeValue();
+                        }
                     }
 
                     @Override

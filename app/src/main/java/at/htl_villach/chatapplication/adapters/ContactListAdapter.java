@@ -97,10 +97,13 @@ public class ContactListAdapter extends BaseAdapter {
                                 if(chat != null) {
                                     for(String key : chat.keySet()) {
                                         usersInChat = (HashMap<String, Object>) chat.get(key);
-                                        usersInChat = (HashMap<String, Object>) usersInChat.get("users");
-                                        if(usersInChat.containsKey(currUser.getUid()) && usersInChat.containsKey(thisUser.getId())) {
-                                            foundChat = (HashMap<String, Object>) chat.get(key);
+                                        if(!(Boolean) usersInChat.get("isGroupChat")) {
+                                            usersInChat = (HashMap<String, Object>) usersInChat.get("users");
+                                            if(usersInChat.containsKey(currUser.getUid()) && usersInChat.containsKey(thisUser.getId())) {
+                                                foundChat = (HashMap<String, Object>) chat.get(key);
+                                            }
                                         }
+
                                     }
 
                                     if(foundChat != null) {
