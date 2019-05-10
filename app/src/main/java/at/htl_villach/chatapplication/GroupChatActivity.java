@@ -196,7 +196,7 @@ public class GroupChatActivity extends AppCompatActivity {
                     Message m = snapshot.getValue(Message.class);
                     mMessages.add(m);
 
-                    chatAdapter = new ChatAdapter(GroupChatActivity.this, mMessages, groupUsers.get(m.getSender()));
+                    chatAdapter = new ChatAdapter(GroupChatActivity.this, mMessages);
                     recyclerViewMessages.setAdapter(chatAdapter);
                 }
             }

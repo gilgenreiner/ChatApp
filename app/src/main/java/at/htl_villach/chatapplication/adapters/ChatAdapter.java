@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,11 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
 import java.util.List;
@@ -32,15 +38,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public static final int MSG_TYPE_RIGHT = 1;
 
     FirebaseUser fuser;
+    DatabaseReference referenceUsers;
 
     private Context mContext;
     private List<Message> mMessages;
     private User sender;
 
-    public ChatAdapter(Context mContext, List<Message> mMessages, User sender) {
+    public ChatAdapter(Context mContext, List<Message> mMessages) {
         this.mMessages = mMessages;
         this.mContext = mContext;
-        this.sender = sender;
     }
 
     @NonNull
@@ -60,12 +66,24 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         Message message = mMessages.get(position);
 
         holder.messageBody.setText(message.getMessage());
-        holder.sendFrom.setText(sender.getFullname());
+
+        referenceUsers = FirebaseDatabase.getInstance().getReference("Users").child(message.getSender());
+        referenceUsers.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                holder.sendFrom.setText(snapshot.getValue(User.class).getFullname());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
 
         if (holder.getItemViewType() == MSG_TYPE_LEFT) {
             if ((position - 1) < 0) {
                 holder.sendFrom.setVisibility(View.VISIBLE);
-            } else if (mMessages.get(position - 1).getSender().equals(sender.getId())) {
+            } else if (mMessages.get(position - 1).getSender().equals(message.getSender())) {
                 holder.sendFrom.setVisibility(View.GONE);
             } else {
                 holder.sendFrom.setVisibility(View.VISIBLE);

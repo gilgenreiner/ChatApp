@@ -204,7 +204,7 @@ public class ChatActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     mMessages.add(snapshot.getValue(Message.class));
 
-                    chatAdapter = new ChatAdapter(ChatActivity.this, mMessages, selectedUser);
+                    chatAdapter = new ChatAdapter(ChatActivity.this, mMessages);
                     recyclerViewMessages.setAdapter(chatAdapter);
                 }
             }
