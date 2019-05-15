@@ -2,18 +2,27 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="10dp"
+    android:paddingVertical="5dp"
     android:paddingLeft="15dp"
     android:paddingRight="60dp"
     android:clipToPadding="false"
     android:id="@+id/message_layout">
 
     <TextView
-        android:id="@+id/message_username"
+        android:id="@+id/message_datetime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:elevation="2dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:text="12. April 2019" />
+
+    <TextView
+        android:id="@+id/message_username"
+        android:layout_below="@+id/message_datetime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:paddingBottom="4dp"
         android:text="Others" />
 
@@ -29,4 +38,11 @@
         android:elevation="2dp"
         android:textSize="18dp"
         android:text="Placeholder message"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/message_seen"
+        android:visibility="gone"
+        android:layout_below="@id/message_body" />
 </RelativeLayout>

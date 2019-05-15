@@ -14,12 +14,14 @@ public class Message {
     private String id;
     private String message;
     private Long timestamp;
+    private boolean isseen;
 
-    public Message(String sender, String id, String message, Long timestamp) {
+    public Message(String sender, String id, String message, Long timestamp, boolean isseen) {
         this.sender = sender;
         this.id = id;
         this.message = message;
         this.timestamp = timestamp;
+        this.isseen = isseen;
     }
 
     public Message() {
@@ -61,5 +63,19 @@ public class Message {
         Calendar cal = Calendar.getInstance(Locale.GERMANY);
         cal.setTimeInMillis(this.timestamp * 1000L);
         return DateFormat.format("hh:mm", cal).toString();
+    }
+
+    public String getTimeAsDate() {
+        Calendar cal = Calendar.getInstance(Locale.GERMANY);
+        cal.setTimeInMillis(this.timestamp * 1000L);
+        return DateFormat.format("dd. MMMM yyyy", cal).toString();
+    }
+
+    public boolean isIsseen() {
+        return isseen;
+    }
+
+    public void setIsseen(boolean isseen) {
+        this.isseen = isseen;
     }
 }

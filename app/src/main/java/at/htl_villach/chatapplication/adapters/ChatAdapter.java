@@ -89,6 +89,26 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                 holder.sendFrom.setVisibility(View.VISIBLE);
             }
         }
+
+        holder.datetime.setText(message.getTimeAsDate());
+        if ((position - 1) < 0) {
+            holder.datetime.setVisibility(View.VISIBLE);
+        } else if (mMessages.get(position - 1).getTimeAsDate().equals(message.getTimeAsDate())) {
+            holder.datetime.setVisibility(View.GONE);
+        } else {
+            holder.datetime.setVisibility(View.VISIBLE);
+        }
+
+        if (position == mMessages.size() - 1 && message.getSender().equals(fuser.getUid())) {
+            holder.isseen.setVisibility(View.VISIBLE);
+            if (message.isIsseen()) {
+                holder.isseen.setText("Seen");
+            } else {
+                holder.isseen.setText("Delivered");
+            }
+        } else {
+            holder.isseen.setVisibility(View.GONE);
+        }
     }
 
     public Message getMessage(int position) {
@@ -105,13 +125,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         public RelativeLayout layout;
         public TextView messageBody;
         public TextView sendFrom;
+        public TextView datetime;
+        public TextView isseen;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             layout = itemView.findViewById(R.id.message_layout);
+            datetime = itemView.findViewById(R.id.message_datetime);
             messageBody = itemView.findViewById(R.id.message_body);
             sendFrom = itemView.findViewById(R.id.message_username);
+            isseen = itemView.findViewById(R.id.message_seen);
         }
     }
 

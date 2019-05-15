@@ -90,6 +90,8 @@ public class ChatActivity extends AppCompatActivity {
                 //set Layouts with user data
                 toolbarTitle.setText(selectedUser.getFullname());
                 //toDo: Custom ProfilPicture
+
+                seenMessage(currentChat.getReceiver(selectedUser.getId()), currentChat.getId());
             }
 
             @Override
@@ -108,7 +110,7 @@ public class ChatActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                startActivity(new Intent(ChatActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
 
@@ -180,6 +182,28 @@ public class ChatActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void seenMessage(final String userid, String chat_id) {
+        referenceMessages = FirebaseDatabase.getInstance().getReference("Messages").child(chat_id);
+        referenceMessages.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Message m = snapshot.getValue(Message.class);
+                    if (!m.getSender().equals(fuser.getUid())) {
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("isseen", true);
+                        snapshot.getRef().updateChildren(hashMap);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void sendMessage(String chatId, String sender, String message){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         String messageId = reference.child("Messages").child(chatId).push().getKey();
@@ -189,6 +213,7 @@ public class ChatActivity extends AppCompatActivity {
         hashMap.put("sender", sender);
         hashMap.put("message", message);
         hashMap.put("timestamp", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        hashMap.put("isseen", false);
 
         reference.child("Messages").child(chatId).child(messageId).setValue(hashMap);
     }
@@ -209,10 +234,17 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
 
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(ChatActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
     }
 }
