@@ -53,7 +53,6 @@ public class GroupChatActivity extends AppCompatActivity {
     ImageButton btnSend;
     RecyclerView recyclerViewMessages;
     ChatAdapter chatAdapter;
-    SwipeController swipeController;
     LinearLayoutManager linearLayoutManager;
 
     //Database
@@ -140,16 +139,6 @@ public class GroupChatActivity extends AppCompatActivity {
         recyclerViewMessages.setLayoutManager(linearLayoutManager);
 
         readMessages(currentChat.getId());
-
-        swipeController = new SwipeController();
-        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
-        itemTouchhelper.attachToRecyclerView(recyclerViewMessages);
-        recyclerViewMessages.addItemDecoration(new RecyclerView.ItemDecoration() {
-            @Override
-            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-                swipeController.onDraw(c, chatAdapter);
-            }
-        });
     }
 
     @Override

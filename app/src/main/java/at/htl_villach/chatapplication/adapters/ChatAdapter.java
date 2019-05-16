@@ -7,11 +7,14 @@ import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.chauthai.swipereveallayout.SwipeRevealLayout;
+import com.chauthai.swipereveallayout.ViewBinderHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -42,11 +45,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     private Context mContext;
     private List<Message> mMessages;
-    private User sender;
+
+    private ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
 
     public ChatAdapter(Context mContext, List<Message> mMessages) {
         this.mMessages = mMessages;
         this.mContext = mContext;
+
+        viewBinderHelper.setOpenOnlyOne(true);
     }
 
     @NonNull
@@ -64,6 +70,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(final @NonNull ChatAdapter.ViewHolder holder, int position) {
         Message message = mMessages.get(position);
+        viewBinderHelper.bind(holder.swipeLayout, message.getId());
 
         holder.messageBody.setText(message.getMessage());
 
@@ -109,10 +116,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         } else {
             holder.isseen.setVisibility(View.GONE);
         }
-    }
 
-    public Message getMessage(int position) {
-        return mMessages.get(position);
+        holder.layout.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                for (Message m : mMessages) {
+                    viewBinderHelper.closeLayout(m.getId());
+                }
+            }
+        });
+
+        //todo: try to make the swipe go back alone
     }
 
     @Override
@@ -123,6 +138,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public RelativeLayout layout;
+        public SwipeRevealLayout swipeLayout;
         public TextView messageBody;
         public TextView sendFrom;
         public TextView datetime;
@@ -132,6 +148,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             super(itemView);
 
             layout = itemView.findViewById(R.id.message_layout);
+            swipeLayout = itemView.findViewById(R.id.swipe_layout);
             datetime = itemView.findViewById(R.id.message_datetime);
             messageBody = itemView.findViewById(R.id.message_body);
             sendFrom = itemView.findViewById(R.id.message_username);
