@@ -1,6 +1,8 @@
 package at.htl_villach.chatapplication;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -21,14 +23,26 @@ public class ProfileActivity extends AppCompatActivity {
         final Toolbar toolProfile = findViewById(R.id.toolProfile);
         Intent intent = getIntent();
 
-        User selectedContact = (User) intent.getParcelableExtra("selectedContact");
-        if(selectedContact.getProfilePicture() == 0) {
-            profilePicture.setImageResource(R.drawable.standard_picture);
-        } else {
-            profilePicture.setImageResource(selectedContact.getProfilePicture());
-        }
+        final User selectedContact = (User) intent.getParcelableExtra("selectedContact");
+
+
+
         txtName.setText(selectedContact.getFullname());
         txtUsername.setText(selectedContact.getUsername());
         toolProfile.setTitle("Contact Details");
+
+        profilePicture.post(new Runnable() {
+            @Override
+            public void run() {
+                if(selectedContact.getProfilePictureResource().length != 0) {
+                    byte[] bytePicture = selectedContact.getProfilePictureResource();
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytePicture, 0, bytePicture.length);
+                    profilePicture.setImageBitmap(Bitmap.createScaledBitmap(bitmap, profilePicture.getWidth(),
+                            profilePicture.getHeight(), false));
+                } else {
+                    profilePicture.setImageResource(R.drawable.standard_picture);
+                }
+            }
+        });
     }
 }

@@ -1,6 +1,8 @@
 package at.htl_villach.chatapplication.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -11,12 +13,17 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.auth.api.signin.internal.Storage;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +39,8 @@ public class ChatListAdapter extends BaseAdapter {
     DatabaseReference database;
     DatabaseReference database2;
     FirebaseAuth firebaseAuth;
+    StorageReference storageReference;
+    private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
 
 
 
@@ -62,10 +71,11 @@ public class ChatListAdapter extends BaseAdapter {
         final TextView item = view.findViewById(R.id.txtName);
         TextView subitem = view.findViewById(R.id.txtLastChat);
 
-        CircleImageView image = (CircleImageView) view.findViewById(R.id.list_picture);
+        final CircleImageView image = (CircleImageView) view.findViewById(R.id.list_picture);
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("Users");
         database2 = FirebaseDatabase.getInstance().getReference("Groups");
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         if(contacts.get(i).getGroupChat()) {
             database2.child(contacts.get(i).getId())
@@ -118,6 +128,21 @@ public class ChatListAdapter extends BaseAdapter {
                             }
                         });
             }
+            storageReference.child(userToLookup + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+                    .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, image.getWidth(),
+                                    image.getHeight(), false));
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            image.setImageResource(R.drawable.standard_picture);
+                        }
+                    });
         }
 
 

@@ -29,6 +29,7 @@ import at.htl_villach.chatapplication.bll.User;
 
 public class AddUserActivity extends AppCompatActivity {
     DatabaseReference database;
+    DatabaseReference database2;
     FirebaseAuth firebaseAuth;
     User userFound;
 
@@ -47,6 +48,7 @@ public class AddUserActivity extends AppCompatActivity {
         });
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("Users");
+        database2 = FirebaseDatabase.getInstance().getReference("Requests");
 
         final LinearLayout layout_user_found = findViewById(R.id.layout_user_found);
         final TextView txtFullName = findViewById(R.id.txtFullName);
@@ -145,7 +147,7 @@ public class AddUserActivity extends AppCompatActivity {
         btnAddUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference ref = database.child(firebaseAuth.getCurrentUser().getUid()).child("friends");
+                /*DatabaseReference ref = database.child(firebaseAuth.getCurrentUser().getUid()).child("friends");
                 HashMap<String, Object> newFriend = new HashMap<>();
                 newFriend.put(userFound.getId(), true);
                 ref.updateChildren(newFriend)
@@ -155,7 +157,22 @@ public class AddUserActivity extends AppCompatActivity {
                         btnAddUser.setVisibility(View.INVISIBLE);
                         imgCheck.setVisibility(View.VISIBLE);
                     }
-                });
+                });*/
+
+                DatabaseReference ref = database2.child(userFound.getId());
+
+                HashMap<String, Object> newRequest = new HashMap<>();
+                newRequest.put(firebaseAuth.getCurrentUser().getUid(), true);
+
+                ref.updateChildren(newRequest)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                btnAddUser.setVisibility(View.INVISIBLE);
+                                imgCheck.setVisibility(View.VISIBLE);
+                            }
+                        });
+
             }
         });
 

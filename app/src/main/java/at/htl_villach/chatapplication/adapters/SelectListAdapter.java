@@ -70,9 +70,10 @@ public class SelectListAdapter extends BaseAdapter {
 
         subitem.setText(contacts.get(position).getUsername());
 
+        /* TODO: Rewrite
         if(contacts.get(position).getProfilePicture() == 0) {
             image.setImageResource(R.drawable.standard_picture);
-        }
+        }*/
         return convertView;
     }
 

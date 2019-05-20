@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import at.htl_villach.chatapplication.fragments.chats;
 import at.htl_villach.chatapplication.fragments.contacts;
+import at.htl_villach.chatapplication.fragments.requests;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
     private int numberTabs;
@@ -33,6 +34,9 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
                 chats chatSection = new chats();
                 return chatSection;
 
+            case 2:
+                requests requestSection = new requests();
+                return requestSection;
             default:
                 return null;
 

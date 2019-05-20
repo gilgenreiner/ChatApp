@@ -7,9 +7,9 @@ public class User implements Parcelable {
 
     private String id;
     private String fullname;
-    private int profilePictureResource;
     private String email;
     private String username;
+    private byte[] profilePictureResource;
 
     public User() {
         super();
@@ -17,7 +17,7 @@ public class User implements Parcelable {
         this.email = null;
         this.username = null;
         this.fullname = null;
-        this.profilePictureResource = 0;
+        this.profilePictureResource = new byte[0];
     }
 
 
@@ -25,15 +25,17 @@ public class User implements Parcelable {
         this.id = id;
         this.email = email;
         this.username = username;
-        this.profilePictureResource = 0;
+        this.profilePictureResource = new byte[0];
+        this.fullname = null;
     }
 
     protected User(Parcel in) {
         id = in.readString();
-        profilePictureResource = in.readInt();
         email = in.readString();
         username = in.readString();
         fullname = in.readString();
+        profilePictureResource = new byte[in.readInt()];
+        in.readByteArray(profilePictureResource);
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -56,10 +58,11 @@ public class User implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeInt(profilePictureResource);
         dest.writeString(email);
         dest.writeString(username);
         dest.writeString(fullname);
+        dest.writeInt(profilePictureResource.length);
+        dest.writeByteArray(profilePictureResource);
     }
 
     public String getUsername() {
@@ -67,10 +70,6 @@ public class User implements Parcelable {
     }
 
     public void setUsername(String username) { this.username = username; }
-
-    public int getProfilePicture() {
-        return profilePictureResource;
-    }
 
     public String getId() {
         return id;
@@ -94,5 +93,13 @@ public class User implements Parcelable {
 
     public void setFullname(String fullname) {
         this.fullname = fullname;
+    }
+
+    public byte[] getProfilePictureResource() {
+        return profilePictureResource;
+    }
+
+    public void setProfilePictureResource(byte[] profilePictureResource) {
+        this.profilePictureResource = profilePictureResource;
     }
 }
