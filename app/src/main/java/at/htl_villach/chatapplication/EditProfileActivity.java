@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -26,7 +27,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -89,6 +93,7 @@ public class EditProfileActivity extends AppCompatActivity {
                                 checkPermissionAndTakePhotoIfGranted();
                                 break;
                             case 2:
+                                deleteProfilePicture();
                                 break;
                             default:
                                 Toast.makeText(getApplicationContext(), "Something unexpected happened", Toast.LENGTH_SHORT).show();
@@ -109,6 +114,17 @@ public class EditProfileActivity extends AppCompatActivity {
 
     }
 
+    private void deleteProfilePicture() {
+        storageReference.child(user.getUid() + "/profilePicture.jpg")
+                .delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        loadImage();
+                    }
+                });
+    }
+
     private void loadImage() {
         storageReference.child(user.getUid() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
         .addOnSuccessListener(new OnSuccessListener<byte[]>() {
@@ -117,6 +133,12 @@ public class EditProfileActivity extends AppCompatActivity {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 profilePicture.setImageBitmap(Bitmap.createScaledBitmap(bitmap, profilePicture.getWidth(),
                         profilePicture.getHeight(), false));
+            }
+        })
+        .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                profilePicture.setImageResource(R.drawable.standard_picture);
             }
         });
     }
@@ -167,18 +189,36 @@ public class EditProfileActivity extends AppCompatActivity {
                 } else if (requestCode == TAKE_PICTURE) {
                     checkOrientation();
                     saveImageToDatabase();
+
                 }
             }
         } catch(Exception ex) {
+            Log.e("app", "onActivityResult", ex);
             Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
         }
 
     }
 
     private void checkOrientation() throws Exception {
-        ExifInterface exif = new ExifInterface(imageUri.getPath());
+        String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+        String filePath;
+
+        Cursor cursor = getApplicationContext().getContentResolver().query( imageUri, filePathColumn, null, null, null );
+        if(cursor != null) {
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex( filePathColumn[0] );
+            filePath = cursor.getString( columnIndex );
+            cursor.close();
+        } else {
+            filePath = imageUri.getPath();
+        }
+
+
+        ExifInterface exif = new ExifInterface(filePath);
         int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-        Bitmap bitmap = BitmapFactory.decodeFile(imageUri.getPath());
+        Bitmap bitmap = BitmapFactory.decodeFile(filePath);
         bitmap = createSquaredBitmap(bitmap);
 
         if(orientation == 6) {
@@ -186,10 +226,10 @@ public class EditProfileActivity extends AppCompatActivity {
             matrix.postRotate(90);
             Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
-            FileOutputStream out = new FileOutputStream(imageUri.getPath());
+            FileOutputStream out = new FileOutputStream(filePath);
             rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 40, out);
         } else {
-            FileOutputStream out = new FileOutputStream(imageUri.getPath());
+            FileOutputStream out = new FileOutputStream(filePath);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 40, out);
         }
     }
@@ -211,6 +251,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Toast.makeText(getApplicationContext(), "Image saved", Toast.LENGTH_SHORT).show();
+                        loadImage();
 
                     }
                 });
@@ -238,7 +279,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void captureImage() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photo = new File(Environment.getExternalStorageDirectory(), "profilePicture.jpg");
+        File photo = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/profilePicture.jpg");
         imageUri = Uri.fromFile(photo);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         startActivityForResult(intent, TAKE_PICTURE);
