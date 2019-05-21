@@ -1,19 +1,16 @@
 package at.htl_villach.chatapplication;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,56 +20,61 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import at.htl_villach.chatapplication.adapters.ChatroomAdapter;
 import at.htl_villach.chatapplication.bll.Chat;
-import at.htl_villach.chatapplication.bll.Message;
 import at.htl_villach.chatapplication.bll.User;
 import at.htl_villach.chatapplication.fragments.ChatroomFragment;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class GroupChatActivity extends AppCompatActivity {
+
+public class SingleChatActivity extends AppCompatActivity {
+
     private Chat currentChat;
-    private HashMap<String, User> groupUsers;
+    private User selectedUser;
+
+    FirebaseUser fuser;
+    DatabaseReference referenceUsers;
 
     //toolbar
     Toolbar toolbar;
     TextView toolbarTitle;
     CircleImageView toolbarPicture;
 
-    //Database
-    FirebaseUser fuser;
-    DatabaseReference referenceUsers;
-    DatabaseReference referenceGroupchat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_chat);
+        setContentView(R.layout.activity_single_chat);
 
         Intent intent = getIntent();
         currentChat = (Chat) intent.getParcelableExtra("selectedChat");
 
         fuser = FirebaseAuth.getInstance().getCurrentUser();
-        groupUsers = getGroupchatUsers();
-
-        referenceGroupchat = FirebaseDatabase.getInstance().getReference("Groups").child(currentChat.getId());
-        referenceGroupchat.addValueEventListener(new ValueEventListener() {
+        referenceUsers = FirebaseDatabase.getInstance().getReference("Users").child(currentChat.getReceiver(fuser.getUid()));
+        referenceUsers.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-               HashMap<String,String> data = (HashMap<String,String>) dataSnapshot.getValue();
-                if(data != null) {
-                   toolbarTitle.setText(data.get("title"));
-                }
+            public void onDataChange(DataSnapshot snapshot) {
+                selectedUser = snapshot.getValue(User.class);
+
+                //set Layouts with user data
+                toolbarTitle.setText(selectedUser.getFullname());
+                toolbarPicture.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (selectedUser.getProfilePictureResource().length != 0) {
+                            byte[] bytePicture = selectedUser.getProfilePictureResource();
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytePicture, 0, bytePicture.length);
+                            toolbarPicture.setImageBitmap(Bitmap.createScaledBitmap(bitmap, toolbarPicture.getWidth(),
+                                    toolbarPicture.getHeight(), false));
+                        } else {
+                            toolbarPicture.setImageResource(R.drawable.standard_picture);
+                        }
+                    }
+                });
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
+
             }
         });
 
@@ -86,6 +88,7 @@ public class GroupChatActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //startActivity(new Intent(SingleChatActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 finish();
             }
         });
@@ -93,25 +96,25 @@ public class GroupChatActivity extends AppCompatActivity {
         //toDo: loadProfilPicture
         //toolbarPicture.setImageResource();
 
-        /*toolbar.setOnClickListener(new View.OnClickListener() {
+        toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(SingleChatActivity.this, ProfileActivity.class);
                 intent.putExtra("selectedContact", selectedUser);
                 startActivity(intent);
             }
-        });*/
+        });
 
         ChatroomFragment chatroom = (ChatroomFragment) getFragmentManager().findFragmentById(R.id.chatroom);
 
         chatroom = ChatroomFragment.newInstance(currentChat);
         getFragmentManager().beginTransaction().add(R.id.chatroom, chatroom).commit();
-
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.menu_chat, menu);
+        getMenuInflater().inflate(R.menu.menu_chat, menu);
         return true;
     }
 
@@ -119,8 +122,8 @@ public class GroupChatActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menuChatProfil:
-                Intent intent = new Intent(GroupChatActivity.this, ProfileActivity.class);
-                //intent.putExtra("selectedContact", selectedUser);
+                Intent intent = new Intent(SingleChatActivity.this, ProfileActivity.class);
+                intent.putExtra("selectedContact", selectedUser);
                 startActivity(intent);
                 break;
         }
@@ -128,24 +131,8 @@ public class GroupChatActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private HashMap<String, User> getGroupchatUsers() {
-        final HashMap<String, User> result = new HashMap<String, User>();
-
-        for (final String key : currentChat.getUsers().keySet()) {
-            referenceUsers = FirebaseDatabase.getInstance().getReference("Users").child(key);
-            referenceUsers.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    result.put(key, snapshot.getValue(User.class));
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    System.out.println("The read failed: " + databaseError.getCode());
-                }
-            });
-        }
-
-        return result;
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(SingleChatActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
     }
 }

@@ -3,49 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity"
-    android:background="#e6e6e6"
-    >
-
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/bar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar_chat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:titleTextAppearance="@style/ToolbarTextAppearance.Title"
-            app:subtitleTextAppearance="@style/ToolbarTextAppearance.Subtitle"
-            style="@style/MyToolbar"
-            app:popupTheme="@style/MyPopupTheme">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/toolbar_profilpicture"
-                android:layout_marginLeft="-20dp"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:src="@drawable/standard_picture"/>
-
-            <TextView
-                android:id="@+id/toolbar_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:textColor="#fff" />
-
-        </android.support.v7.widget.Toolbar>
-    </android.support.design.widget.AppBarLayout>
+    android:background="#e6e6e6">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_messages"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottom"
-        android:layout_below="@id/bar_layout" />
+        android:layout_above="@id/bottom" />
 
     <RelativeLayout
         android:id="@+id/bottom"

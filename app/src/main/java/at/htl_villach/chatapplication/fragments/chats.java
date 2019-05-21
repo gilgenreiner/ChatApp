@@ -2,14 +2,11 @@ package at.htl_villach.chatapplication.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.Layout;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,13 +24,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import at.htl_villach.chatapplication.ChatActivity;
+import at.htl_villach.chatapplication.SingleChatActivity;
 import at.htl_villach.chatapplication.GroupChatActivity;
 import at.htl_villach.chatapplication.R;
 import at.htl_villach.chatapplication.adapters.ChatListAdapter;
-import at.htl_villach.chatapplication.adapters.ContactListAdapter;
 import at.htl_villach.chatapplication.bll.Chat;
-import at.htl_villach.chatapplication.bll.User;
 
 
 public class chats extends Fragment {
@@ -84,7 +79,7 @@ public class chats extends Fragment {
                     intent = new Intent(getActivity(), GroupChatActivity.class);
 
                 } else {
-                    intent = new Intent(getActivity(), ChatActivity.class);
+                    intent = new Intent(getActivity(), SingleChatActivity.class);
                 }
                 intent.putExtra("selectedChat", chat);
                 startActivity(intent);
