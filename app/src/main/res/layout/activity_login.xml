@@ -12,8 +12,8 @@
         android:layout_height="111dp" />
 
     <android.support.design.widget.TextInputLayout
-        style="@style/TILStyle"
         android:id="@+id/txtEmail"
+        style="@style/TILStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/hint_email"
@@ -26,12 +26,13 @@
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        style="@style/TILStyle"
         android:id="@+id/txtPassword"
+        style="@style/TILStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/hint_password"
-        app:errorEnabled="true">
+        app:errorEnabled="true"
+        app:passwordToggleEnabled="true">
 
         <android.support.design.widget.TextInputEditText
             android:layout_width="match_parent"
@@ -46,6 +47,18 @@
         android:text="@string/button_login"
         android:theme="@style/MyButton"
         android:layout_gravity="right"/>
+
+    <TextView
+        android:id="@+id/ForgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginRight="30dp"
+        android:clickable="true"
+        android:onClick="forgetPasswordClicked"
+        android:padding="5dp"
+        android:text="Forgot Password?"
+        android:textColor="@color/colorPrimaryDark" />
 
     <LinearLayout
         android:layout_width="match_parent"
