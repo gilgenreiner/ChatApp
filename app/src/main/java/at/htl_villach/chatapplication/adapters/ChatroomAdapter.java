@@ -1,17 +1,16 @@
 package at.htl_villach.chatapplication.adapters;
 
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateFormat;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import com.chauthai.swipereveallayout.SwipeRevealLayout;
 import com.chauthai.swipereveallayout.ViewBinderHelper;
@@ -23,9 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 import at.htl_villach.chatapplication.R;
 import at.htl_villach.chatapplication.bll.Message;
@@ -35,29 +32,31 @@ import at.htl_villach.chatapplication.bll.User;
  * Created by pupil on 4/23/19.
  */
 
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
+public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHolder> {
 
     public static final int MSG_TYPE_LEFT = 0;
     public static final int MSG_TYPE_RIGHT = 1;
 
-    FirebaseUser fuser;
-    DatabaseReference referenceUsers;
+    private FirebaseUser fuser;
+    private DatabaseReference referenceUsers;
 
+    private Activity mActivity;
     private Context mContext;
     private List<Message> mMessages;
 
     private ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
 
-    public ChatAdapter(Context mContext, List<Message> mMessages) {
+    public ChatroomAdapter(Context mContext, List<Message> mMessages, Activity activity) {
         this.mMessages = mMessages;
         this.mContext = mContext;
+        this.mActivity = activity;
 
         viewBinderHelper.setOpenOnlyOne(true);
     }
 
     @NonNull
     @Override
-    public ChatAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ChatroomAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == MSG_TYPE_RIGHT) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.my_message, parent, false);
             return new ViewHolder(view);
@@ -68,7 +67,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final @NonNull ChatAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final @NonNull ChatroomAdapter.ViewHolder holder, int position) {
         Message message = mMessages.get(position);
         viewBinderHelper.bind(holder.swipeLayout, message.getId());
 
@@ -127,7 +126,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             }
         });
 
-        //todo: try to make the swipe go back alone
+        if (message.getSender().equals(fuser.getUid())) {
+            holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
+
+                @Override
+                public boolean onLongClick(View v) {
+                    Toolbar t = mActivity.findViewById(R.id.toolbar);
+                    // MenuItem m = mActivity.findViewById(R.id.menuDeleteMessage);
+                    //m.setVisible(true);
+                    //mActivity.findViewById(R.id.menuSendMessageTo).setVisibility(View.VISIBLE);
+                    //mActivity.findViewById(R.id.menuMessageInfo).setVisibility(View.VISIBLE);
+                    //mActivity.findViewById(R.id.menuChatProfil).setVisibility(View.GONE);
+                    return false;
+                }
+            });
+        }
     }
 
     @Override

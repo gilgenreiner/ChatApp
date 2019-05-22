@@ -9,10 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -31,7 +29,7 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import at.htl_villach.chatapplication.ChatActivity;
+import at.htl_villach.chatapplication.SingleChatActivity;
 import at.htl_villach.chatapplication.R;
 import at.htl_villach.chatapplication.bll.Chat;
 import at.htl_villach.chatapplication.bll.User;
@@ -134,7 +132,7 @@ public class ContactListAdapter extends BaseAdapter {
 
                                     if (foundChat != null) {
                                         Chat chatObject = new Chat((String) foundChat.get("id"), (HashMap<String, Boolean>) foundChat.get("users"), (Boolean) foundChat.get("isGroupChat"));
-                                        Intent intent = new Intent(innerView.getContext(), ChatActivity.class);
+                                        Intent intent = new Intent(innerView.getContext(), SingleChatActivity.class);
                                         intent.putExtra("selectedChat", chatObject);
                                         innerView.getContext().startActivity(intent);
                                     } else {
@@ -170,7 +168,7 @@ public class ContactListAdapter extends BaseAdapter {
                 newChat.put("isGroupChat", false);
                 newChat.put("users", userPair);
 
-                final Intent intent = new Intent(context, ChatActivity.class);
+                final Intent intent = new Intent(context, SingleChatActivity.class);
                 intent.putExtra("selectedChat", new Chat(id, userPair, false));
 
                 database.child(id).setValue(newChat)

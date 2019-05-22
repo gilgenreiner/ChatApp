@@ -18,15 +18,15 @@
             android:layout_height="wrap_content"
             app:titleTextAppearance="@style/ToolbarTextAppearance.Title"
             app:subtitleTextAppearance="@style/ToolbarTextAppearance.Subtitle"
-            style="@style/MyToolbar">
+            style="@style/MyToolbar"
+            app:popupTheme="@style/MyPopupTheme">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/toolbar_profilpicture"
                 android:layout_marginLeft="-20dp"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:src="@drawable/standard_picture"
-                app:popupTheme="@style/MyPopupTheme"/>
+                android:src="@drawable/standard_picture" />
 
             <TextView
                 android:id="@+id/toolbar_title"
