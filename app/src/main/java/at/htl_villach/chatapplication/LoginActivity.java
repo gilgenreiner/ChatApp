@@ -6,12 +6,15 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -89,5 +92,28 @@ public class LoginActivity extends AppCompatActivity {
             super.onBackPressed();
         }
     }
-}
 
+
+    public void forgetPasswordClicked (View v){
+        TextInputLayout txtEmail = findViewById(R.id.txtEmail);
+        String email = txtEmail.getEditText().getText().toString();
+
+        if(TextUtils.isEmpty(email)){
+            Toast.makeText(getApplicationContext(), "Please enter your E-Mail", Toast.LENGTH_SHORT).show();
+        }else {
+            FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        public static final String TAG = "TAG String";
+
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getApplicationContext(), "We have sent you instructions to reset your password!", Toast.LENGTH_SHORT).show();
+                            }else{
+                                Toast.makeText(getApplicationContext(), "Failed to send reset email!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
+    }
+}
