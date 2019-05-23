@@ -128,7 +128,7 @@ public class ChatListAdapter extends BaseAdapter {
                             }
                         });
             }
-            storageReference.child(userToLookup + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+            storageReference.child("users/" + userToLookup + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
                     .addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
                         public void onSuccess(byte[] bytes) {

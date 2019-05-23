@@ -78,7 +78,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
         profilePicture.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
                 final String[] items = {"Choose from Gallery", "Open Camera", "Delete Current Picture"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(EditProfileActivity.this);
                 builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -87,7 +86,6 @@ public class EditProfileActivity extends AppCompatActivity {
                         switch(which) {
                             case 0:
                                 checkPermissionAndPickPhotoIfGranted();
-
                                 break;
                             case 1:
                                 checkPermissionAndTakePhotoIfGranted();
@@ -115,7 +113,7 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void deleteProfilePicture() {
-        storageReference.child(user.getUid() + "/profilePicture.jpg")
+        storageReference.child("users/" + user.getUid() + "/profilePicture.jpg")
                 .delete()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -126,7 +124,7 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void loadImage() {
-        storageReference.child(user.getUid() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+        storageReference.child("users/" + user.getUid() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
         .addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
@@ -246,7 +244,7 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void saveImageToDatabase() {
-        storageReference.child(user.getUid() + "/profilePicture.jpg").putFile(imageUri)
+        storageReference.child("users/" + user.getUid() + "/profilePicture.jpg").putFile(imageUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -276,6 +274,8 @@ public class EditProfileActivity extends AppCompatActivity {
             pickImage();
         }
     }
+
+
 
     private void captureImage() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

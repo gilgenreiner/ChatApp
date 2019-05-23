@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -19,6 +21,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import at.htl_villach.chatapplication.bll.Chat;
 import at.htl_villach.chatapplication.bll.User;
@@ -33,6 +37,8 @@ public class SingleChatActivity extends AppCompatActivity {
 
     FirebaseUser fuser;
     DatabaseReference referenceUsers;
+    StorageReference storageReference;
+    private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
 
     //toolbar
     Toolbar toolbar;
@@ -48,6 +54,8 @@ public class SingleChatActivity extends AppCompatActivity {
         Intent intent = getIntent();
         currentChat = (Chat) intent.getParcelableExtra("selectedChat");
 
+        storageReference = FirebaseStorage.getInstance().getReference();
+
         fuser = FirebaseAuth.getInstance().getCurrentUser();
         referenceUsers = FirebaseDatabase.getInstance().getReference("Users").child(currentChat.getReceiver(fuser.getUid()));
         referenceUsers.addValueEventListener(new ValueEventListener() {
@@ -60,14 +68,22 @@ public class SingleChatActivity extends AppCompatActivity {
                 toolbarPicture.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (selectedUser.getProfilePictureResource().length != 0) {
-                            byte[] bytePicture = selectedUser.getProfilePictureResource();
-                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytePicture, 0, bytePicture.length);
-                            toolbarPicture.setImageBitmap(Bitmap.createScaledBitmap(bitmap, toolbarPicture.getWidth(),
-                                    toolbarPicture.getHeight(), false));
-                        } else {
-                            toolbarPicture.setImageResource(R.drawable.standard_picture);
-                        }
+                        storageReference.child(selectedUser.getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+                                .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                    @Override
+                                    public void onSuccess(byte[] bytes) {
+                                        selectedUser.setProfilePictureResource(bytes);
+                                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                        toolbarPicture.setImageBitmap(Bitmap.createScaledBitmap(bitmap, toolbarPicture.getWidth(),
+                                                toolbarPicture.getHeight(), false));
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        toolbarPicture.setImageResource(R.drawable.standard_picture);
+                                    }
+                                });
                     }
                 });
             }

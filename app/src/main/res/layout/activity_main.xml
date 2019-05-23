@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:context=".MainActivity"
-    android:fitsSystemWindows="true">
+    tools:context=".MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -15,32 +15,32 @@
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
+            style="@style/MyToolbarWithTabs"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_gravity="top"
             android:minHeight="?attr/actionBarSize"
-            app:titleTextAppearance="@style/ToolbarTextAppearance.Title"
-            app:subtitleTextAppearance="@style/ToolbarTextAppearance.Subtitle"
-            style="@style/MyToolbarWithTabs"
             app:layout_collapseMode="pin"
-            app:popupTheme="@style/MyPopupTheme"/>
+            app:popupTheme="@style/MyPopupTheme"
+            app:subtitleTextAppearance="@style/ToolbarTextAppearance.Subtitle"
+            app:titleTextAppearance="@style/ToolbarTextAppearance.Title" />
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tbMain"
+            style="@style/TabLayoutStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            style="@style/TabLayoutStyle">
+            android:layout_gravity="bottom">
+
+            <android.support.design.widget.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chats" />
 
             <android.support.design.widget.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Contacts" />
-
-            <android.support.design.widget.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chats" />
 
             <android.support.design.widget.TabItem
                 android:layout_width="wrap_content"
@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="16dp"
-            android:src="@drawable/ic_person_add"/>
+            android:src="@drawable/ic_person_add" />
     </FrameLayout>
 
 

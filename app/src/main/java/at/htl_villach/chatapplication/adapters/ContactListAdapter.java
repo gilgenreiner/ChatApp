@@ -87,7 +87,7 @@ public class ContactListAdapter extends BaseAdapter {
 
         subitem.setText(contacts.get(i).getUsername());
 
-        storageReference.child(thisUser.getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+        storageReference.child("users/" + thisUser.getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
                 .addOnSuccessListener(new OnSuccessListener<byte[]>() {
                     @Override
                     public void onSuccess(byte[] bytes) {

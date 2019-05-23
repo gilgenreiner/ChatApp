@@ -24,16 +24,13 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        switch(position) {
+        switch (position) {
             case 0:
-
-                contacts contactSection = new contacts();
-                return contactSection;
-
-            case 1:
                 chats chatSection = new chats();
                 return chatSection;
-
+            case 1:
+                contacts contactSection = new contacts();
+                return contactSection;
             case 2:
                 requests requestSection = new requests();
                 return requestSection;
@@ -50,7 +47,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
-        if(getCurrentFragment() != object) {
+        if (getCurrentFragment() != object) {
             currFragment = (Fragment) object;
         }
         super.setPrimaryItem(container, position, object);
