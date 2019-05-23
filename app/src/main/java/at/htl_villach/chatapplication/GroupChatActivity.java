@@ -36,37 +36,42 @@ import at.htl_villach.chatapplication.fragments.ChatroomFragment;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class GroupChatActivity extends AppCompatActivity {
-    private Chat currentChat;
-    private HashMap<String, User> groupUsers;
-
     //toolbar
     Toolbar toolbar;
     TextView toolbarTitle;
     CircleImageView toolbarPicture;
+
+    //Fragment
+    ChatroomFragment chatroom;
 
     //Database
     FirebaseUser fuser;
     DatabaseReference referenceUsers;
     DatabaseReference referenceGroupchat;
 
+    //Data
+    private Chat currentChat;
+    private ArrayList<User> groupUsers = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat);
 
-        Intent intent = getIntent();
-        currentChat = (Chat) intent.getParcelableExtra("selectedChat");
+        currentChat = (Chat) getIntent().getParcelableExtra("selectedChat");
+
+        setGroupchatUsers();
 
         fuser = FirebaseAuth.getInstance().getCurrentUser();
-        groupUsers = getGroupchatUsers();
 
         referenceGroupchat = FirebaseDatabase.getInstance().getReference("Groups").child(currentChat.getId());
         referenceGroupchat.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-               HashMap<String,String> data = (HashMap<String,String>) dataSnapshot.getValue();
-                if(data != null) {
-                   toolbarTitle.setText(data.get("title"));
+                HashMap<String, String> data = (HashMap<String, String>) dataSnapshot.getValue();
+                if (data != null) {
+                    toolbarTitle.setText(data.get("title"));
+                    //todo groupchatpicture
                 }
             }
 
@@ -90,28 +95,25 @@ public class GroupChatActivity extends AppCompatActivity {
             }
         });
 
-        //toDo: loadProfilPicture
-        //toolbarPicture.setImageResource();
-
-        /*toolbar.setOnClickListener(new View.OnClickListener() {
+        toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(SingleChatActivity.this, ProfileActivity.class);
-                intent.putExtra("selectedContact", selectedUser);
+                Intent intent = new Intent(GroupChatActivity.this, GroupInfoActivity.class);
+                intent.putExtra("groupChat", currentChat);
                 startActivity(intent);
             }
-        });*/
+        });
 
-        ChatroomFragment chatroom = (ChatroomFragment) getFragmentManager().findFragmentById(R.id.chatroom);
-
+        chatroom = (ChatroomFragment) getSupportFragmentManager().findFragmentById(R.id.chatroom);
         chatroom = ChatroomFragment.newInstance(currentChat);
-        getFragmentManager().beginTransaction().add(R.id.chatroom, chatroom).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.chatroom, chatroom).commit();
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.menu_chat, menu);
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.menu_chat, menu);
         return true;
     }
 
@@ -119,24 +121,21 @@ public class GroupChatActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menuChatProfil:
-                Intent intent = new Intent(GroupChatActivity.this, ProfileActivity.class);
-                //intent.putExtra("selectedContact", selectedUser);
+                Intent intent = new Intent(GroupChatActivity.this, GroupInfoActivity.class);
+                intent.putExtra("test", groupUsers);
                 startActivity(intent);
-                break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private HashMap<String, User> getGroupchatUsers() {
-        final HashMap<String, User> result = new HashMap<String, User>();
-
-        for (final String key : currentChat.getUsers().keySet()) {
+    private void setGroupchatUsers() {
+        for (String key : currentChat.getUsers().keySet()) {
             referenceUsers = FirebaseDatabase.getInstance().getReference("Users").child(key);
             referenceUsers.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-                    result.put(key, snapshot.getValue(User.class));
+                    groupUsers.add(snapshot.getValue(User.class));
                 }
 
                 @Override
@@ -145,7 +144,5 @@ public class GroupChatActivity extends AppCompatActivity {
                 }
             });
         }
-
-        return result;
     }
 }
