@@ -3,6 +3,9 @@ package at.htl_villach.chatapplication.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,14 +14,15 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
-import android.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -32,69 +36,31 @@ import at.htl_villach.chatapplication.adapters.ChatroomAdapter;
 import at.htl_villach.chatapplication.bll.Chat;
 import at.htl_villach.chatapplication.bll.Message;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class ChatroomFragment extends Fragment {
 
-    private Chat currentChat;
+    public static int TOTAL_ITEMS_TO_LOAD = 10;
 
-    private List<Message> mMessages;
-
-    //normal controlls
-    EditText messageToSend;
-    ImageButton btnSend;
-    RecyclerView recyclerViewMessages;
-    ChatroomAdapter chatroomAdapter;
-    LinearLayoutManager linearLayoutManager;
+    //controlls
+    private EditText messageToSend;
+    private ImageButton btnSend;
+    private RecyclerView recyclerViewMessages;
+    private ChatroomAdapter chatroomAdapter;
+    private LinearLayoutManager linearLayoutManager;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     //Database
-    FirebaseUser fuser;
-    DatabaseReference referenceMessages;
+    private FirebaseUser fuser;
+    private DatabaseReference mRootRef;
 
-    ValueEventListener seenMessageListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-            for (final DataSnapshot snapshotMessage : dataSnapshot.getChildren()) {
-                final Message m = snapshotMessage.getValue(Message.class);
+    private Chat mCurrentChat;
+    private List<Message> mMessages = new ArrayList<>();
+    private int mCurrentPage = 1;
+    private int mItemPos = 0;
+    private String mLastkey = "";
+    private String mPrevKey = "";
 
-                if (!m.isIsseen()) {
-                    DatabaseReference referenceMessageSeen = FirebaseDatabase.getInstance().getReference("MessagesSeenBy").child(m.getId());
-                    referenceMessageSeen.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshotMessageSeenBy) {
-                            HashMap<String, Object> MessageSeenby = new HashMap<>();
-                            for (DataSnapshot ds : dataSnapshotMessageSeenBy.getChildren()) {
-                                MessageSeenby.put(ds.getKey(), ds.getValue());
-                            }
+    private ValueEventListener valueEventListener;
 
-                            if (MessageSeenby.containsKey(fuser.getUid()) && !m.getSender().equals(fuser.getUid())) {
-                                HashMap<String, Object> hashMap2 = new HashMap<>();
-                                hashMap2.put(fuser.getUid(), true);
-                                dataSnapshotMessageSeenBy.getRef().updateChildren(hashMap2);
-                            }
-
-                            HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("isseen", (!MessageSeenby.containsValue(false)));
-                            snapshotMessage.getRef().updateChildren(hashMap);
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                }
-            }
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-        }
-    };
 
     public ChatroomFragment() {
         // Required empty public constructor
@@ -102,27 +68,29 @@ public class ChatroomFragment extends Fragment {
 
     public static ChatroomFragment newInstance(Chat selectedChat) {
         ChatroomFragment toDoListFragment = new ChatroomFragment();
+
         Bundle args = new Bundle();
         args.putParcelable("selectedChat", selectedChat);
         toDoListFragment.setArguments(args);
+
         return toDoListFragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        currentChat = getArguments().getParcelable("selectedChat");
+        mCurrentChat = getArguments().getParcelable("selectedChat");
     }
 
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chatroom, container, false);
 
         fuser = FirebaseAuth.getInstance().getCurrentUser();
+        mRootRef = FirebaseDatabase.getInstance().getReference();
 
         messageToSend = (EditText) view.findViewById(R.id.message_to_send);
+
         btnSend = (ImageButton) view.findViewById(R.id.btn_send);
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,7 +98,7 @@ public class ChatroomFragment extends Fragment {
                 String msg = messageToSend.getText().toString();
 
                 if (!msg.trim().equals("")) {
-                    sendMessage(currentChat.getId(), fuser.getUid(), msg.trim());
+                    sendMessage(msg.trim());
                 } else {
                     Toast.makeText(getActivity(), R.string.emptyMessage, Toast.LENGTH_SHORT).show();
                 }
@@ -142,59 +110,76 @@ public class ChatroomFragment extends Fragment {
         linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
 
-        recyclerViewMessages = (RecyclerView) view.findViewById(R.id.recycler_view_messages);
-        recyclerViewMessages.setLayoutManager(linearLayoutManager);
+        chatroomAdapter = new ChatroomAdapter(getContext(), mMessages, mCurrentChat);
 
-        readMessages(currentChat.getId());
-        seenMessage(currentChat.getId());
+        recyclerViewMessages = (RecyclerView) view.findViewById(R.id.recycler_view_messages);
+        recyclerViewMessages.setNestedScrollingEnabled(false);
+
+        recyclerViewMessages.setLayoutManager(linearLayoutManager);
+        recyclerViewMessages.setAdapter(chatroomAdapter);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mCurrentPage++;
+                mItemPos = 0;
+
+                readMoreMessages();
+            }
+        });
+
+        readMessages();
+        updateSeenMessage();
 
         return view;
     }
 
-    public void seenMessage(String chat_id) {
-        referenceMessages = FirebaseDatabase.getInstance().getReference("Messages").child(chat_id);
-        referenceMessages.addValueEventListener(seenMessageListener);
-    }
+    private void readMoreMessages() {
+        DatabaseReference messagesRef = mRootRef.child("Messages").child(mCurrentChat.getId());
+        Query messageQuery = messagesRef.orderByKey().endAt(mLastkey).limitToLast(10);
 
-    private void sendMessage(String chatId, String sender, String message) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        String messageId = reference.child("Messages").child(chatId).push().getKey();
-
-        HashMap<String, Object> hashMapMessage = new HashMap<>();
-        hashMapMessage.put("id", messageId);
-        hashMapMessage.put("sender", sender);
-        hashMapMessage.put("message", message);
-        hashMapMessage.put("timestamp", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-        hashMapMessage.put("isseen", false);
-
-        reference.child("Messages").child(chatId).child(messageId).setValue(hashMapMessage);
-
-        HashMap<String, Object> hashMapMessageSeenBy = new HashMap<>();
-        for (Map.Entry<String, Boolean> entry : currentChat.getUsers().entrySet()) {
-            if (!entry.getKey().equals(fuser.getUid())) {
-                hashMapMessageSeenBy.put(entry.getKey(), false);
-            }
-        }
-
-        reference.child("MessagesSeen").child(messageId).setValue(hashMapMessageSeenBy);
-    }
-
-    private void readMessages(final String chat_id) {
-        mMessages = new ArrayList<Message>();
-
-        referenceMessages = FirebaseDatabase.getInstance().getReference("Messages").child(chat_id);
-        referenceMessages.addValueEventListener(new ValueEventListener() {
+        messageQuery.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mMessages.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    mMessages.add(snapshot.getValue(Message.class));
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Message message = dataSnapshot.getValue(Message.class);
 
-                    chatroomAdapter = new ChatroomAdapter(getContext(), mMessages, getActivity());
-                    recyclerViewMessages.setAdapter(chatroomAdapter);
+                if (!mPrevKey.equals(message.getId())) {
+                    mMessages.add(mItemPos++, message);
+                } else {
+                    mPrevKey = mLastkey;
                 }
+
+                if (mItemPos == 1) {
+                    mLastkey = message.getId();
+                }
+
+                if (!message.getSender().equals(fuser.getUid())) {
+                    mRootRef.child("MessagesSeenBy").child(mCurrentChat.getId()).child(message.getId()).child(fuser.getUid()).setValue(true);
+                }
+
+                chatroomAdapter.notifyDataSetChanged();
+                swipeRefreshLayout.setRefreshing(false);
+                //linearLayoutManager.scrollToPositionWithOffset(0, 10);
             }
 
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                Message m = dataSnapshot.getValue(Message.class);
+
+                mMessages.remove(m);
+                chatroomAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -203,9 +188,99 @@ public class ChatroomFragment extends Fragment {
         });
     }
 
+    private void readMessages() {
+        DatabaseReference messagesRef = mRootRef.child("Messages").child(mCurrentChat.getId());
+        Query messageQuery = messagesRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
+
+        messageQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mMessages.clear();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Message message = ds.getValue(Message.class);
+
+                    mItemPos++;
+
+                    if (mItemPos == 1) {
+                        mLastkey = message.getId();
+                        mPrevKey = mLastkey;
+                    }
+
+                    if (!message.getSender().equals(fuser.getUid()) && !message.isIsseen()) {
+                        mRootRef.child("MessagesSeenBy").child(mCurrentChat.getId()).child(message.getId()).child(fuser.getUid()).setValue(true);
+                    }
+
+                    mMessages.add(message);
+                }
+                chatroomAdapter.notifyDataSetChanged();
+
+                recyclerViewMessages.scrollToPosition(mMessages.size() - 1);
+                swipeRefreshLayout.setRefreshing(false);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private HashMap<DatabaseReference, ValueEventListener> groupCreatorAndKeys = new HashMap<>();
+
+    private void updateSeenMessage() {
+        DatabaseReference seenMessagesRef = mRootRef.child("MessagesSeenBy").child(mCurrentChat.getId());
+        seenMessagesRef.addValueEventListener(valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                HashMap<String, HashMap<String, Object>> messageSeenBy = (HashMap<String, HashMap<String, Object>>) dataSnapshot.getValue();
+
+                for (Message m : mMessages) {
+                    if (!m.isIsseen()) {
+                        if (!messageSeenBy.get(m.getId()).containsValue(false)) {
+                            mRootRef.child("Messages").child(mCurrentChat.getId()).child(m.getId()).child("isseen").setValue(true);
+                        }
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        groupCreatorAndKeys.put(seenMessagesRef, valueEventListener);
+
+    }
+
+    private void sendMessage(String message) {
+        DatabaseReference sendMessagesRef = mRootRef.child("Messages").child(mCurrentChat.getId());
+        String messageId = sendMessagesRef.push().getKey();
+
+        HashMap<String, Object> hashMapMessage = new HashMap<>();
+        hashMapMessage.put("id", messageId);
+        hashMapMessage.put("sender", fuser.getUid());
+        hashMapMessage.put("message", message);
+        hashMapMessage.put("timestamp", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        hashMapMessage.put("isseen", false);
+
+        sendMessagesRef.child(messageId).updateChildren(hashMapMessage);
+
+        HashMap<String, Object> hashMapMessageSeenBy = new HashMap<>();
+        for (Map.Entry<String, Boolean> entry : mCurrentChat.getUsers().entrySet()) {
+            if (!entry.getKey().equals(fuser.getUid())) {
+                hashMapMessageSeenBy.put(entry.getKey(), false);
+            }
+        }
+        mRootRef.child("MessagesSeenBy").child(mCurrentChat.getId()).child(messageId).setValue(hashMapMessageSeenBy);
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        referenceMessages.removeEventListener(seenMessageListener);
+
+        mRootRef = null;
     }
 }
