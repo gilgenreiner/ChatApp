@@ -1,5 +1,7 @@
 package at.htl_villach.chatapplication.bll;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.format.DateFormat;
 
 import java.util.Calendar;
@@ -9,7 +11,7 @@ import java.util.Locale;
  * Created by pupil on 4/22/19.
  */
 
-public class Message {
+public class Message implements Parcelable {
     private String sender;
     private String id;
     private String message;
@@ -26,6 +28,30 @@ public class Message {
 
     public Message() {
     }
+
+    protected Message(Parcel in) {
+        sender = in.readString();
+        id = in.readString();
+        message = in.readString();
+        if (in.readByte() == 0) {
+            timestamp = null;
+        } else {
+            timestamp = in.readLong();
+        }
+        isseen = in.readByte() != 0;
+    }
+
+    public static final Creator<Message> CREATOR = new Creator<Message>() {
+        @Override
+        public Message createFromParcel(Parcel in) {
+            return new Message(in);
+        }
+
+        @Override
+        public Message[] newArray(int size) {
+            return new Message[size];
+        }
+    };
 
     public String getSender() {
         return sender;
@@ -77,5 +103,31 @@ public class Message {
 
     public void setIsseen(boolean isseen) {
         this.isseen = isseen;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(sender);
+        dest.writeString(id);
+        dest.writeString(message);
+        if (timestamp == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(timestamp);
+        }
+        dest.writeByte((byte) (isseen ? 1 : 0));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Message m = (Message) obj;
+
+        return this.getId().equals(m.getId());
     }
 }

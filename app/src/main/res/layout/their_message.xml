@@ -55,7 +55,7 @@
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/message_layout"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:paddingLeft="15dp"
             android:paddingRight="60dp">
@@ -68,7 +68,7 @@
                 android:elevation="2dp"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="12dp"
-                android:text="Placeholder message"
+                android:text="@string/placeholderMessage"
                 android:textSize="18dp" />
         </RelativeLayout>
     </com.chauthai.swipereveallayout.SwipeRevealLayout>

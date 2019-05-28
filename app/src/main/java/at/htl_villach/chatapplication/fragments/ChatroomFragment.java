@@ -1,6 +1,5 @@
 package at.htl_villach.chatapplication.fragments;
 
-
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -51,16 +50,16 @@ public class ChatroomFragment extends Fragment {
     //Database
     private FirebaseUser fuser;
     private DatabaseReference mRootRef;
+    private ValueEventListener valueEventListener;
+    private HashMap<DatabaseReference, ValueEventListener> databaseListeners = new HashMap<>();
 
+    //data
     private Chat mCurrentChat;
     private List<Message> mMessages = new ArrayList<>();
     private int mCurrentPage = 1;
     private int mItemPos = 0;
-    private String mLastkey = "";
+    private String mLastKey = "";
     private String mPrevKey = "";
-
-    private ValueEventListener valueEventListener;
-
 
     public ChatroomFragment() {
         // Required empty public constructor
@@ -137,7 +136,7 @@ public class ChatroomFragment extends Fragment {
 
     private void readMoreMessages() {
         DatabaseReference messagesRef = mRootRef.child("Messages").child(mCurrentChat.getId());
-        Query messageQuery = messagesRef.orderByKey().endAt(mLastkey).limitToLast(10);
+        Query messageQuery = messagesRef.orderByKey().endAt(mLastKey).limitToLast(10);
 
         messageQuery.addChildEventListener(new ChildEventListener() {
             @Override
@@ -147,11 +146,11 @@ public class ChatroomFragment extends Fragment {
                 if (!mPrevKey.equals(message.getId())) {
                     mMessages.add(mItemPos++, message);
                 } else {
-                    mPrevKey = mLastkey;
+                    mPrevKey = mLastKey;
                 }
 
                 if (mItemPos == 1) {
-                    mLastkey = message.getId();
+                    mLastKey = message.getId();
                 }
 
                 if (!message.getSender().equals(fuser.getUid())) {
@@ -160,6 +159,8 @@ public class ChatroomFragment extends Fragment {
 
                 chatroomAdapter.notifyDataSetChanged();
                 swipeRefreshLayout.setRefreshing(false);
+
+                //todo: springen zur richtigen position
                 //linearLayoutManager.scrollToPositionWithOffset(0, 10);
             }
 
@@ -192,7 +193,7 @@ public class ChatroomFragment extends Fragment {
         DatabaseReference messagesRef = mRootRef.child("Messages").child(mCurrentChat.getId());
         Query messageQuery = messagesRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
 
-        messageQuery.addValueEventListener(new ValueEventListener() {
+        messageQuery.addValueEventListener(valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mMessages.clear();
@@ -202,8 +203,8 @@ public class ChatroomFragment extends Fragment {
                     mItemPos++;
 
                     if (mItemPos == 1) {
-                        mLastkey = message.getId();
-                        mPrevKey = mLastkey;
+                        mLastKey = message.getId();
+                        mPrevKey = mLastKey;
                     }
 
                     if (!message.getSender().equals(fuser.getUid()) && !message.isIsseen()) {
@@ -216,7 +217,6 @@ public class ChatroomFragment extends Fragment {
 
                 recyclerViewMessages.scrollToPosition(mMessages.size() - 1);
                 swipeRefreshLayout.setRefreshing(false);
-
             }
 
             @Override
@@ -224,12 +224,12 @@ public class ChatroomFragment extends Fragment {
 
             }
         });
+
+        databaseListeners.put(messagesRef, valueEventListener);
     }
 
-    private HashMap<DatabaseReference, ValueEventListener> groupCreatorAndKeys = new HashMap<>();
-
     private void updateSeenMessage() {
-        DatabaseReference seenMessagesRef = mRootRef.child("MessagesSeenBy").child(mCurrentChat.getId());
+        DatabaseReference seenMessagesRef = FirebaseDatabase.getInstance().getReference("MessagesSeenBy").child(mCurrentChat.getId());
         seenMessagesRef.addValueEventListener(valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -251,8 +251,7 @@ public class ChatroomFragment extends Fragment {
             }
         });
 
-        groupCreatorAndKeys.put(seenMessagesRef, valueEventListener);
-
+        databaseListeners.put(seenMessagesRef, valueEventListener);
     }
 
     private void sendMessage(String message) {
@@ -281,6 +280,10 @@ public class ChatroomFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
 
-        mRootRef = null;
+        for (Map.Entry<DatabaseReference, ValueEventListener> entry : databaseListeners.entrySet()) {
+            DatabaseReference databaseReference = entry.getKey();
+            ValueEventListener value = entry.getValue();
+            databaseReference.removeEventListener(value);
+        }
     }
 }
