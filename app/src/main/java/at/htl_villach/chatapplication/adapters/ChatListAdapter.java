@@ -43,7 +43,6 @@ public class ChatListAdapter extends BaseAdapter {
     private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
 
 
-
     public ChatListAdapter(Context applicationContext, ArrayList<Chat> contacts) {
         this.contacts = contacts;
         this.inflater = (LayoutInflater.from(applicationContext));
@@ -77,13 +76,13 @@ public class ChatListAdapter extends BaseAdapter {
         database2 = FirebaseDatabase.getInstance().getReference("Groups");
         storageReference = FirebaseStorage.getInstance().getReference();
 
-        if(contacts.get(i).getGroupChat()) {
+        if (contacts.get(i).getGroupChat()) {
             database2.child(contacts.get(i).getId())
                     .addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             HashMap<String, String> group = (HashMap<String, String>) dataSnapshot.getValue();
-                            if(group != null) {
+                            if (group != null) {
                                 String title = group.get("title");
                                 item.setText(title);
                             }
@@ -97,19 +96,19 @@ public class ChatListAdapter extends BaseAdapter {
         } else {
             HashMap<String, Boolean> users = contacts.get(i).getUsers();
             String userToLookup = "";
-            for(String key : users.keySet()) {
-                if(!firebaseAuth.getCurrentUser().getUid().equals(key)) {
+            for (String key : users.keySet()) {
+                if (!firebaseAuth.getCurrentUser().getUid().equals(key)) {
                     userToLookup = key;
                 }
             }
-            if(!TextUtils.isEmpty(userToLookup)) {
+            if (!TextUtils.isEmpty(userToLookup)) {
                 database.orderByChild("id")
                         .equalTo(userToLookup)
                         .addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                HashMap<String, HashMap<String,String>> user = (HashMap<String,HashMap<String,String>>) dataSnapshot.getValue();
-                                if(user != null) {
+                                HashMap<String, HashMap<String, String>> user = (HashMap<String, HashMap<String, String>>) dataSnapshot.getValue();
+                                if (user != null) {
                                     final User userObject = new User();
                                     for (String key : user.keySet()) {
                                         userObject.setUsername(user.get(key).get("username"));
@@ -128,23 +127,28 @@ public class ChatListAdapter extends BaseAdapter {
                             }
                         });
             }
-            storageReference.child("users/" + userToLookup + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
-                    .addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                        @Override
-                        public void onSuccess(byte[] bytes) {
-                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                            image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, image.getWidth(),
-                                    image.getHeight(), false));
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            image.setImageResource(R.drawable.standard_picture);
-                        }
-                    });
+            final String finalUserToLookup = userToLookup;
+            image.post(new Runnable() {
+                @Override
+                public void run() {
+                    storageReference.child("users/" + finalUserToLookup + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+                            .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                @Override
+                                public void onSuccess(byte[] bytes) {
+                                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                    image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, image.getWidth(),
+                                            image.getHeight(), false));
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    image.setImageResource(R.drawable.standard_picture);
+                                }
+                            });
+                }
+            });
         }
-
 
 
         //subitem.setText(contacts.get(i).getUsername());

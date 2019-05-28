@@ -3,14 +3,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="#e6e6e6">
+    android:background="#e6e6e6"
+    tools:context=".MainActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view_messages"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/bottom" />
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottom">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_messages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/bottom" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <RelativeLayout
         android:id="@+id/bottom"
@@ -25,16 +33,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
             android:layout_toLeftOf="@id/btn_send"
             android:background="@drawable/rounded_edittext"
-            android:layout_marginRight="5dp"
-            android:padding="6dp"
-            android:hint="@string/hint_chatmessage"
-            android:scrollbars="vertical"
             android:fadeScrollbars="false"
+            android:hint="@string/hint_chatmessage"
             android:inputType="textMultiLine"
             android:maxLines="4"
-            android:minLines="1"/>
+            android:minLines="1"
+            android:padding="6dp"
+            android:scrollbars="vertical" />
 
         <ImageButton
             android:id="@+id/btn_send"

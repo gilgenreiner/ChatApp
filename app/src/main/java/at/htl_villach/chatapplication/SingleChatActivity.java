@@ -121,10 +121,10 @@ public class SingleChatActivity extends AppCompatActivity {
             }
         });
 
-        ChatroomFragment chatroom = (ChatroomFragment) getFragmentManager().findFragmentById(R.id.chatroom);
+        ChatroomFragment chatroom = (ChatroomFragment) getSupportFragmentManager().findFragmentById(R.id.chatroom);
 
         chatroom = ChatroomFragment.newInstance(currentChat);
-        getFragmentManager().beginTransaction().add(R.id.chatroom, chatroom).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.chatroom, chatroom).commit();
     }
 
 
