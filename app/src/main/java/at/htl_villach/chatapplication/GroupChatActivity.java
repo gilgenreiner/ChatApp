@@ -1,6 +1,8 @@
 package at.htl_villach.chatapplication;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +17,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -22,6 +26,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +42,8 @@ import at.htl_villach.chatapplication.fragments.ChatroomFragment;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class GroupChatActivity extends AppCompatActivity {
+    private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
+
     //toolbar
     Toolbar toolbar;
     TextView toolbarTitle;
@@ -48,6 +56,7 @@ public class GroupChatActivity extends AppCompatActivity {
     FirebaseUser fuser;
     DatabaseReference referenceUsers;
     DatabaseReference referenceGroupchat;
+    StorageReference storageReference;
 
     //Data
     private Chat currentChat;
@@ -63,6 +72,7 @@ public class GroupChatActivity extends AppCompatActivity {
         setGroupchatUsers();
 
         fuser = FirebaseAuth.getInstance().getCurrentUser();
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         referenceGroupchat = FirebaseDatabase.getInstance().getReference("Groups").child(currentChat.getId());
         referenceGroupchat.addValueEventListener(new ValueEventListener() {
@@ -71,7 +81,27 @@ public class GroupChatActivity extends AppCompatActivity {
                 HashMap<String, String> data = (HashMap<String, String>) dataSnapshot.getValue();
                 if (data != null) {
                     toolbarTitle.setText(data.get("title"));
-                    //todo groupchatpicture
+                    toolbarPicture.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            storageReference.child("groups/" + currentChat.getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+                                    .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                        @Override
+                                        public void onSuccess(byte[] bytes) {
+                                            //selectedUser.setProfilePictureResource(bytes);
+                                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                            toolbarPicture.setImageBitmap(Bitmap.createScaledBitmap(bitmap, toolbarPicture.getWidth(),
+                                                    toolbarPicture.getHeight(), false));
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            toolbarPicture.setImageResource(R.drawable.standard_picture);
+                                        }
+                                    });
+                        }
+                    });
                 }
             }
 

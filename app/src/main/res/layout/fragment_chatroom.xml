@@ -28,21 +28,37 @@
         android:background="@android:color/transparent"
         android:padding="5dp">
 
-        <EditText
-            android:id="@+id/message_to_send"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:layout_toLeftOf="@id/btn_send"
+            android:orientation="horizontal"
             android:background="@drawable/rounded_edittext"
-            android:fadeScrollbars="false"
-            android:hint="@string/hint_chatmessage"
-            android:inputType="textMultiLine"
-            android:maxLines="4"
-            android:minLines="1"
-            android:padding="6dp"
-            android:scrollbars="vertical" />
+            android:layout_toLeftOf="@id/btn_send">
+
+            <EditText
+                android:id="@+id/message_to_send"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="5dp"
+                android:background="@android:color/transparent"
+                android:fadeScrollbars="false"
+                android:hint="@string/hint_chatmessage"
+                android:inputType="textMultiLine"
+                android:maxLines="4"
+                android:minLines="1"
+                android:padding="6dp"
+                android:scrollbars="vertical" />
+
+            <ImageButton
+                android:id="@+id/btn_sendPicture"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginRight="5dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_photo_camera_24dp" />
+        </RelativeLayout>
 
         <ImageButton
             android:id="@+id/btn_send"
