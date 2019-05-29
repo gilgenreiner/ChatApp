@@ -1,6 +1,9 @@
 package at.htl_villach.chatapplication.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,8 +12,12 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
@@ -24,7 +31,9 @@ public class SelectListAdapter extends BaseAdapter {
     LayoutInflater inflater;
     DatabaseReference database;
     FirebaseAuth firebaseAuth;
+    private StorageReference storageReference;
 
+    private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
 
     public SelectListAdapter(Context applicationContext, ArrayList<User> contacts) {
         this.contacts = contacts;
@@ -51,13 +60,15 @@ public class SelectListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         convertView = inflater.inflate(R.layout.select_list, null);
         TextView item = convertView.findViewById(R.id.txtName);
         TextView subitem = convertView.findViewById(R.id.txtUsername);
-        CircleImageView image = (CircleImageView) convertView.findViewById(R.id.list_picture);
+        final CircleImageView image = (CircleImageView) convertView.findViewById(R.id.list_picture);
         final CheckBox cbSelectItem = convertView.findViewById(R.id.cbSelectItem);
         final int fposition = position;
+        storageReference = FirebaseStorage.getInstance().getReference();
+
 
         cbSelectItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,10 +81,26 @@ public class SelectListAdapter extends BaseAdapter {
 
         subitem.setText(contacts.get(position).getUsername());
 
-        /* TODO: Rewrite
-        if(contacts.get(position).getProfilePicture() == 0) {
-            image.setImageResource(R.drawable.standard_picture);
-        }*/
+        image.post(new Runnable() {
+            @Override
+            public void run() {
+                storageReference.child("users/" + contacts.get(position).getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+                        .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                            @Override
+                            public void onSuccess(byte[] bytes) {
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, image.getWidth(),
+                                        image.getHeight(), false));
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                image.setImageResource(R.drawable.standard_picture);
+                            }
+                        });
+            }
+        });
         return convertView;
     }
 

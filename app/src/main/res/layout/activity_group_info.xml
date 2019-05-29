@@ -7,6 +7,15 @@
     android:orientation="vertical"
     tools:context=".GroupInfoActivity">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolGroupInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        app:titleTextAppearance="@style/ToolbarTextAppearance.Title"
+        app:subtitleTextAppearance="@style/ToolbarTextAppearance.Subtitle"
+        style="@style/MyToolbar" />
+
     <ImageView
         android:id="@+id/imgGroupPicture"
         android:layout_width="match_parent"
@@ -15,42 +24,18 @@
         />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp">
-
-        <TextView
-            android:id="@+id/txtGroupName"
-            android:layout_width="289dp"
-            android:layout_height="match_parent"
-            android:text="#80000000"
-            android:textSize="30sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageButton
-                android:id="@+id/imgEditGroupName"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@color/textColorWhite"
-                android:src="@drawable/ic_edit_gray" />
-        </LinearLayout>
-
-    </LinearLayout>
+        android:layout_marginTop="20dp"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/group_members"
-        android:textSize="30sp"
+        android:textSize="18sp"
         android:layout_marginStart="20dp" />
 
     <ListView

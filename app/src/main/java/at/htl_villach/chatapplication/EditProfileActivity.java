@@ -43,6 +43,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.HashMap;
@@ -185,8 +186,10 @@ public class EditProfileActivity extends AppCompatActivity {
                     checkOrientation();
                     saveImageToDatabase();
                 } else if (requestCode == TAKE_PICTURE) {
-                    checkOrientation();
-                    saveImageToDatabase();
+                    Bundle extras = data.getExtras();
+                    Bitmap bitmap = (Bitmap) extras.get("data");
+                    bitmap = createSquaredBitmap(bitmap);
+                    saveBitmapToDatabase(bitmap);
 
                 }
             }
@@ -255,6 +258,23 @@ public class EditProfileActivity extends AppCompatActivity {
                 });
     }
 
+    private void saveBitmapToDatabase(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        bitmap.recycle();
+
+        storageReference.child("users/" + user.getUid() + "/profilePicture.jpg").putBytes(byteArray)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Toast.makeText(getApplicationContext(), "Image saved", Toast.LENGTH_SHORT).show();
+                        loadImage();
+
+                    }
+                });
+    }
+
     private void checkPermissionAndTakePhotoIfGranted() {
         int permission = ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
@@ -278,10 +298,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
 
     private void captureImage() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photo = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/profilePicture.jpg");
-        imageUri = Uri.fromFile(photo);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, TAKE_PICTURE);
     }
 
