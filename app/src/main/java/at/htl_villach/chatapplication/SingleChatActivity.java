@@ -68,7 +68,7 @@ public class SingleChatActivity extends AppCompatActivity {
                 toolbarPicture.post(new Runnable() {
                     @Override
                     public void run() {
-                        storageReference.child(selectedUser.getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+                        storageReference.child("users/" + selectedUser.getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
                                 .addOnSuccessListener(new OnSuccessListener<byte[]>() {
                                     @Override
                                     public void onSuccess(byte[] bytes) {

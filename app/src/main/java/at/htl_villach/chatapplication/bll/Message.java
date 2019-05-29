@@ -15,13 +15,15 @@ public class Message implements Parcelable {
     private String sender;
     private String id;
     private String message;
+    private String type;
     private Long timestamp;
     private boolean isseen;
 
-    public Message(String sender, String id, String message, Long timestamp, boolean isseen) {
+    public Message(String sender, String id, String message, String type, Long timestamp, boolean isseen) {
         this.sender = sender;
         this.id = id;
         this.message = message;
+        this.type = type;
         this.timestamp = timestamp;
         this.isseen = isseen;
     }
@@ -33,6 +35,7 @@ public class Message implements Parcelable {
         sender = in.readString();
         id = in.readString();
         message = in.readString();
+        type = in.readString();
         if (in.readByte() == 0) {
             timestamp = null;
         } else {
@@ -115,6 +118,7 @@ public class Message implements Parcelable {
         dest.writeString(sender);
         dest.writeString(id);
         dest.writeString(message);
+        dest.writeString(type);
         if (timestamp == null) {
             dest.writeByte((byte) 0);
         } else {
@@ -129,5 +133,13 @@ public class Message implements Parcelable {
         Message m = (Message) obj;
 
         return this.getId().equals(m.getId());
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

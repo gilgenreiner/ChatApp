@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -14,11 +16,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.chauthai.swipereveallayout.SwipeRevealLayout;
 import com.chauthai.swipereveallayout.ViewBinderHelper;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.List;
 
@@ -42,8 +48,9 @@ import at.htl_villach.chatapplication.bll.User;
 
 public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHolder> {
 
-    public static final int MSG_TYPE_LEFT = 0;
-    public static final int MSG_TYPE_RIGHT = 1;
+    private static final int MSG_TYPE_LEFT = 0;
+    private static final int MSG_TYPE_RIGHT = 1;
+    private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
 
     private FirebaseUser fuser;
     private DatabaseReference referenceUsers;
@@ -83,8 +90,6 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
 
         mViewBinderHelper.bind(holder.swipeLayout, m.getId());
 
-        holder.messageBody.setText(m.getMessage());
-
         referenceUsers = FirebaseDatabase.getInstance().getReference("Users").child(m.getSender());
         referenceUsers.addValueEventListener(new ValueEventListener() {
             @Override
@@ -97,6 +102,32 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
+
+        if (m.getType().equals("text")) {
+            holder.image.setVisibility(View.GONE);
+            holder.messageBody.setVisibility(View.VISIBLE);
+            holder.messageBody.setText(m.getMessage());
+        } else {
+            holder.messageBody.setVisibility(View.GONE);
+            holder.image.setVisibility(View.VISIBLE);
+            FirebaseStorage.getInstance().getReference().child(m.getMessage()).getBytes(MAX_DOWNLOAD_IMAGE)
+                    .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            holder.image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, holder.image.getWidth(),
+                                    holder.image.getHeight(), false));
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            holder.messageBody.setText("Could not load image");
+                            holder.messageBody.setVisibility(View.VISIBLE);
+                            holder.image.setVisibility(View.GONE);
+                        }
+                    });
+        }
 
         if (holder.getItemViewType() == MSG_TYPE_LEFT) {
             if ((position - 1) < 0) {
@@ -138,21 +169,21 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
             }
         });
 
-            holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
 
-                @Override
-                public boolean onLongClick(View v) {
-                    if (mActionMode == null && !mActionModeOn) {
-                        mSelectedMessage = m;
-                        mActionModeOn = true;
-                        mActionMode = ((Activity) mContext).startActionMode(new ActionBarCallback());
-                    } else {
-                        finishActionMode();
-                    }
-
-                    return true;
+            @Override
+            public boolean onLongClick(View v) {
+                if (mActionMode == null && !mActionModeOn) {
+                    mSelectedMessage = m;
+                    mActionModeOn = true;
+                    mActionMode = ((Activity) mContext).startActionMode(new ActionBarCallback());
+                } else {
+                    finishActionMode();
                 }
-            });
+
+                return true;
+            }
+        });
     }
 
     private void finishActionMode() {
@@ -184,6 +215,7 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
         public TextView sendFrom;
         public TextView datetime;
         public TextView isseen;
+        public ImageView image;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -194,6 +226,7 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
             messageBody = itemView.findViewById(R.id.message_body);
             sendFrom = itemView.findViewById(R.id.message_username);
             isseen = itemView.findViewById(R.id.message_seen);
+            image = itemView.findViewById(R.id.message_image);
         }
     }
 
@@ -226,10 +259,10 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.menuMessageInfo:
-                    Intent intent = new Intent(mContext, MessageInfoActivity.class);
-                    intent.putExtra("selectedMessage", mSelectedMessage);
-                    intent.putExtra("selectedChat", mCurrentChat);
-                    mContext.startActivity(intent);
+                    Intent intentMessageInfo = new Intent(mContext, MessageInfoActivity.class);
+                    intentMessageInfo.putExtra("selectedMessage", mSelectedMessage);
+                    intentMessageInfo.putExtra("selectedChat", mCurrentChat);
+                    mContext.startActivity(intentMessageInfo);
                     break;
                 case R.id.menuDeleteMessage:
 
@@ -256,9 +289,9 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
                     dialog.show();
                     break;
                 case R.id.menuSendMessageTo:
-                    Intent intent2 = new Intent(mContext, SendToActivity.class);
-                    intent2.putExtra("selectedMessage", mSelectedMessage);
-                    mContext.startActivity(intent2);
+                    Intent intentSendTo = new Intent(mContext, SendToActivity.class);
+                    intentSendTo.putExtra("selectedMessage", mSelectedMessage);
+                    mContext.startActivity(intentSendTo);
                     break;
             }
             finishActionMode();

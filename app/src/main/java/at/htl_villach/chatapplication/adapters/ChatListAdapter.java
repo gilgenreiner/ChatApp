@@ -65,7 +65,7 @@ public class ChatListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
+    public View getView(final int i, View view, ViewGroup viewGroup) {
         view = inflater.inflate(R.layout.activity_list_chats, null);
         final TextView item = view.findViewById(R.id.txtName);
         TextView subitem = view.findViewById(R.id.txtLastChat);
@@ -86,6 +86,28 @@ public class ChatListAdapter extends BaseAdapter {
                                 String title = group.get("title");
                                 item.setText(title);
                             }
+
+                            image.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    storageReference.child("groups/" + contacts.get(i).getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+                                            .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                                @Override
+                                                public void onSuccess(byte[] bytes) {
+                                                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                                    image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, image.getWidth(),
+                                                            image.getHeight(), false));
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    image.setImageResource(R.drawable.standard_picture);
+                                                }
+                                            });
+                                }
+                            });
+
                         }
 
                         @Override
