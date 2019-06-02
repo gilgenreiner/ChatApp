@@ -4,9 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -22,8 +19,6 @@ import android.widget.TextView;
 
 import com.chauthai.swipereveallayout.SwipeRevealLayout;
 import com.chauthai.swipereveallayout.ViewBinderHelper;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -31,7 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -50,7 +45,6 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
 
     private static final int MSG_TYPE_LEFT = 0;
     private static final int MSG_TYPE_RIGHT = 1;
-    private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
 
     private FirebaseUser fuser;
     private DatabaseReference referenceUsers;
@@ -58,7 +52,6 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
     private ViewBinderHelper mViewBinderHelper = new ViewBinderHelper();
     private Context mContext;
     private ActionMode mActionMode;
-    private Boolean mActionModeOn = false;
     private Chat mCurrentChat;
     private Message mSelectedMessage;
     private List<Message> mMessages;
@@ -85,11 +78,11 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final @NonNull ChatroomAdapter.ViewHolder holder, final int position) {
-
         final Message m = mMessages.get(position);
 
         mViewBinderHelper.bind(holder.swipeLayout, m.getId());
 
+        //sender
         referenceUsers = FirebaseDatabase.getInstance().getReference("Users").child(m.getSender());
         referenceUsers.addValueEventListener(new ValueEventListener() {
             @Override
@@ -103,32 +96,26 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
             }
         });
 
+        //text or image
         if (m.getType().equals("text")) {
             holder.image.setVisibility(View.GONE);
-            holder.messageBody.setVisibility(View.VISIBLE);
-            holder.messageBody.setText(m.getMessage());
+            holder.message.setVisibility(View.VISIBLE);
+            holder.message.setText(m.getMessage());
         } else {
-            holder.messageBody.setVisibility(View.GONE);
+            holder.message.setVisibility(View.GONE);
             holder.image.setVisibility(View.VISIBLE);
-            FirebaseStorage.getInstance().getReference().child(m.getMessage()).getBytes(MAX_DOWNLOAD_IMAGE)
-                    .addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                        @Override
-                        public void onSuccess(byte[] bytes) {
-                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                            holder.image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, holder.image.getWidth(),
-                                    holder.image.getHeight(), false));
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            holder.messageBody.setText("Could not load image");
-                            holder.messageBody.setVisibility(View.VISIBLE);
-                            holder.image.setVisibility(View.GONE);
-                        }
-                    });
+            Picasso.get()
+                    .load(m.getMessage())
+                    .resize(0, 800)
+                    .centerCrop()
+                    .into(holder.image);
+
         }
 
+        //time when message had been send
+        holder.time.setText(m.getTimeAsString());
+
+        //sender
         if (holder.getItemViewType() == MSG_TYPE_LEFT) {
             if ((position - 1) < 0) {
                 holder.sendFrom.setVisibility(View.VISIBLE);
@@ -139,6 +126,7 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
             }
         }
 
+        //datetime
         holder.datetime.setText(m.getTimeAsDate());
         if ((position - 1) < 0) {
             holder.datetime.setVisibility(View.VISIBLE);
@@ -148,9 +136,10 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
             holder.datetime.setVisibility(View.VISIBLE);
         }
 
+        //isSeen
         if (position == mMessages.size() - 1 && m.getSender().equals(fuser.getUid())) {
             holder.isseen.setVisibility(View.VISIBLE);
-            if (m.isIsseen()) {
+            if (m.isSeen()) {
                 holder.isseen.setText("Seen");
             } else {
                 holder.isseen.setText("Delivered");
@@ -159,6 +148,7 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
             holder.isseen.setVisibility(View.GONE);
         }
 
+        //close Layout
         holder.layout.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -169,13 +159,13 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
             }
         });
 
+        //Actionmode (Toolbar change)
         holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
 
             @Override
             public boolean onLongClick(View v) {
-                if (mActionMode == null && !mActionModeOn) {
+                if (mActionMode == null) {
                     mSelectedMessage = m;
-                    mActionModeOn = true;
                     mActionMode = ((Activity) mContext).startActionMode(new ActionBarCallback());
                 } else {
                     finishActionMode();
@@ -189,7 +179,6 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
     private void finishActionMode() {
         mActionMode.finish();
         mActionMode = null;
-        mActionModeOn = false;
     }
 
     @Override
@@ -211,7 +200,8 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
 
         public RelativeLayout layout;
         public SwipeRevealLayout swipeLayout;
-        public TextView messageBody;
+        public TextView message;
+        public TextView time;
         public TextView sendFrom;
         public TextView datetime;
         public TextView isseen;
@@ -223,7 +213,8 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
             layout = itemView.findViewById(R.id.message_layout);
             swipeLayout = itemView.findViewById(R.id.swipe_layout);
             datetime = itemView.findViewById(R.id.message_datetime);
-            messageBody = itemView.findViewById(R.id.message_body);
+            time = itemView.findViewById(R.id.message_time);
+            message = itemView.findViewById(R.id.message_body);
             sendFrom = itemView.findViewById(R.id.message_username);
             isseen = itemView.findViewById(R.id.message_seen);
             image = itemView.findViewById(R.id.message_image);
@@ -265,24 +256,25 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
                     mContext.startActivity(intentMessageInfo);
                     break;
                 case R.id.menuDeleteMessage:
-
                     AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-                    builder.setPositiveButton(R.string.deletePopUpBtnYes, new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton(R.string.popUpBtnYes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             FirebaseDatabase.getInstance().getReference().child("MessagesSeenBy").child(mSelectedMessage.getId()).removeValue();
                             FirebaseDatabase.getInstance().getReference().child("Messages").child(mCurrentChat.getId()).child(mSelectedMessage.getId()).removeValue();
                         }
                     });
 
-                    builder.setNegativeButton(R.string.deletePopUpBtnNo, new DialogInterface.OnClickListener() {
+                    builder.setNegativeButton(R.string.popUpBtnNo, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             dialog.cancel();
                         }
                     });
 
+                    String content = (mSelectedMessage.getType().equals("text")) ? "message " + mSelectedMessage.getMessage() : "image";
+
                     builder.setTitle(R.string.deletePopUpTitle);
-                    builder.setMessage(mContext.getResources().getString(R.string.deletePopUpMessage, mSelectedMessage.getMessage()));
+                    builder.setMessage(mContext.getResources().getString(R.string.deletePopUpMessage, content));
 
                     AlertDialog dialog = builder.create();
 
@@ -294,6 +286,7 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
                     mContext.startActivity(intentSendTo);
                     break;
             }
+
             finishActionMode();
 
             return false;
