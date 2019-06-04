@@ -17,18 +17,17 @@ public class Message implements Parcelable {
     private String message;
     private String type;
     private Long timestamp;
-    private boolean isseen;
+    private boolean seen;
 
-    public Message(String sender, String id, String message, String type, Long timestamp, boolean isseen) {
+    public Message() { }
+
+    public Message(String sender, String id, String message, String type, Long timestamp, boolean seen) {
         this.sender = sender;
         this.id = id;
         this.message = message;
         this.type = type;
         this.timestamp = timestamp;
-        this.isseen = isseen;
-    }
-
-    public Message() {
+        this.seen = seen;
     }
 
     protected Message(Parcel in) {
@@ -41,7 +40,7 @@ public class Message implements Parcelable {
         } else {
             timestamp = in.readLong();
         }
-        isseen = in.readByte() != 0;
+        seen = in.readByte() != 0;
     }
 
     public static final Creator<Message> CREATOR = new Creator<Message>() {
@@ -72,20 +71,36 @@ public class Message implements Parcelable {
         this.message = message;
     }
 
-    public Long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getTimeAsString() {
@@ -98,14 +113,6 @@ public class Message implements Parcelable {
         Calendar cal = Calendar.getInstance(Locale.GERMANY);
         cal.setTimeInMillis(this.timestamp * 1000L);
         return DateFormat.format("dd. MMMM yyyy", cal).toString();
-    }
-
-    public boolean isIsseen() {
-        return isseen;
-    }
-
-    public void setIsseen(boolean isseen) {
-        this.isseen = isseen;
     }
 
     @Override
@@ -125,7 +132,7 @@ public class Message implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeLong(timestamp);
         }
-        dest.writeByte((byte) (isseen ? 1 : 0));
+        dest.writeByte((byte) (seen ? 1 : 0));
     }
 
     @Override
@@ -133,13 +140,5 @@ public class Message implements Parcelable {
         Message m = (Message) obj;
 
         return this.getId().equals(m.getId());
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 }

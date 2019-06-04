@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -13,9 +14,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import at.htl_villach.chatapplication.adapters.MessageSeenByListAdapter;
 import at.htl_villach.chatapplication.bll.Chat;
@@ -23,15 +24,20 @@ import at.htl_villach.chatapplication.bll.Message;
 import at.htl_villach.chatapplication.bll.User;
 
 public class MessageInfoActivity extends AppCompatActivity {
-
+    //toolbar
     private Toolbar toolbar;
-    private TextView tvMessageBody;
+
+    //controls
+    private TextView tvMessage;
     private ListView lvUser;
     private TextView tvTime;
+    private ImageView ivImage;
     private MessageSeenByListAdapter adapter;
 
+    //database
     private DatabaseReference mRootRef;
 
+    //data
     private Message mSelectedMessage;
     private Chat mSelectedChat;
     private ArrayList<User> mUsers = new ArrayList<>();
@@ -46,7 +52,6 @@ public class MessageInfoActivity extends AppCompatActivity {
         mSelectedMessage = getIntent().getParcelableExtra("selectedMessage");
         mSelectedChat = getIntent().getParcelableExtra("selectedChat");
 
-        //todo probieren mit chat.users zu arbeiten!
         DatabaseReference messagesSeenByRef = mRootRef.child("MessagesSeenBy").child(mSelectedChat.getId()).child(mSelectedMessage.getId());
         messagesSeenByRef.addValueEventListener(new ValueEventListener() {
 
@@ -84,8 +89,20 @@ public class MessageInfoActivity extends AppCompatActivity {
             }
         });
 
-        tvMessageBody = findViewById(R.id.message_body);
-        tvMessageBody.setText(mSelectedMessage.getMessage());
+        ivImage = findViewById(R.id.message_image);
+        tvMessage = findViewById(R.id.message_body);
+
+        if (mSelectedMessage.getType().equals("text")) {
+            ivImage.setVisibility(View.GONE);
+            tvMessage.setText(mSelectedMessage.getMessage());
+        } else {
+            tvMessage.setVisibility(View.GONE);
+            Picasso.get()
+                    .load(mSelectedMessage.getMessage())
+                    .resize(0, 800)
+                    .centerCrop()
+                    .into(ivImage);
+        }
 
         tvTime = findViewById(R.id.message_time);
         tvTime.setText(mSelectedMessage.getTimeAsString());

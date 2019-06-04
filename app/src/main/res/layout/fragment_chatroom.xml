@@ -31,9 +31,11 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/btn_send"
             android:background="@drawable/rounded_edittext"
-            android:layout_toLeftOf="@id/btn_send">
+            android:orientation="horizontal"
+            android:padding="7dp">
 
             <EditText
                 android:id="@+id/message_to_send"
@@ -47,16 +49,15 @@
                 android:inputType="textMultiLine"
                 android:maxLines="4"
                 android:minLines="1"
-                android:padding="6dp"
                 android:scrollbars="vertical" />
 
             <ImageButton
                 android:id="@+id/btn_sendPicture"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginRight="5dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
+                android:layout_marginRight="5dp"
                 android:background="@drawable/ic_photo_camera_24dp" />
         </RelativeLayout>
 

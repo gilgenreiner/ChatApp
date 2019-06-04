@@ -4,6 +4,6 @@
 
     <item
         android:id="@+id/menuChatProfil"
-        android:title="@string/menuChatProfil"
+        android:title="@string/menu_moreInformation"
         app:showAsAction="never"/>
 </menu>

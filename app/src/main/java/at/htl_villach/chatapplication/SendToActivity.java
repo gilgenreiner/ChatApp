@@ -1,7 +1,6 @@
 package at.htl_villach.chatapplication;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,6 +19,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,21 +28,25 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import at.htl_villach.chatapplication.adapters.ChatListAdapter;
-import at.htl_villach.chatapplication.adapters.MessageSeenByListAdapter;
 import at.htl_villach.chatapplication.bll.Chat;
 import at.htl_villach.chatapplication.bll.Message;
 
 public class SendToActivity extends AppCompatActivity {
-
+    //toolbar
     private Toolbar toolbar;
-    private TextView tvMessageBody;
+
+    //controls
+    private TextView tvMessage;
     private ListView lvUser;
     private TextView tvTime;
+    private ImageView ivImage;
     private ChatListAdapter adapter;
 
+    //database
     private DatabaseReference mRootRef;
     private FirebaseAuth firebaseAuth;
 
+    //data
     private Message mSelectedMessage;
     private ArrayList<Chat> mChats = new ArrayList<>();
 
@@ -67,8 +73,20 @@ public class SendToActivity extends AppCompatActivity {
             }
         });
 
-        tvMessageBody = findViewById(R.id.message_body);
-        tvMessageBody.setText(mSelectedMessage.getMessage());
+        ivImage = findViewById(R.id.message_image);
+        tvMessage = findViewById(R.id.message_body);
+
+        if (mSelectedMessage.getType().equals("text")) {
+            ivImage.setVisibility(View.GONE);
+            tvMessage.setText(mSelectedMessage.getMessage());
+        } else {
+            tvMessage.setVisibility(View.GONE);
+            Picasso.get()
+                    .load(mSelectedMessage.getMessage())
+                    .resize(0, 800)
+                    .centerCrop()
+                    .into(ivImage);
+        }
 
         tvTime = findViewById(R.id.message_time);
         tvTime.setText(mSelectedMessage.getTimeAsString());
@@ -86,7 +104,7 @@ public class SendToActivity extends AppCompatActivity {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(SendToActivity.this);
 
-                builder.setPositiveButton(R.string.deletePopUpBtnYes, new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(R.string.popUpBtnYes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         DatabaseReference sendMessagesRef = mRootRef.child("Messages").child(chat.getId());
                         String messageId = sendMessagesRef.push().getKey();
@@ -95,8 +113,9 @@ public class SendToActivity extends AppCompatActivity {
                         hashMapMessage.put("id", messageId);
                         hashMapMessage.put("sender", firebaseAuth.getCurrentUser().getUid());
                         hashMapMessage.put("message", mSelectedMessage.getMessage());
+                        hashMapMessage.put("type", mSelectedMessage.getType());
                         hashMapMessage.put("timestamp", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-                        hashMapMessage.put("isseen", false);
+                        hashMapMessage.put("seen", false);
 
                         sendMessagesRef.child(messageId).updateChildren(hashMapMessage);
 
@@ -112,14 +131,16 @@ public class SendToActivity extends AppCompatActivity {
                     }
                 });
 
-                builder.setNegativeButton(R.string.deletePopUpBtnNo, new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(R.string.popUpBtnNo, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
                 });
 
+                String content = (mSelectedMessage.getType().equals("text")) ? "message " + mSelectedMessage.getMessage() : "image";
+
                 builder.setTitle(R.string.sendToPopUpTitle);
-                builder.setMessage(SendToActivity.this.getResources().getString(R.string.sendToPopUpMessage, mSelectedMessage.getMessage()));
+                builder.setMessage(SendToActivity.this.getResources().getString(R.string.sendToPopUpMessage, content));
 
                 AlertDialog dialog = builder.create();
 
@@ -129,7 +150,8 @@ public class SendToActivity extends AppCompatActivity {
     }
 
     private void getChatsFromDatabase() {
-        mRootRef.child("Chats").orderByChild("id")
+        mRootRef.child("Chats")
+                .orderByChild("id")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -159,6 +181,5 @@ public class SendToActivity extends AppCompatActivity {
 
                     }
                 });
-
     }
 }

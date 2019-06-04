@@ -29,22 +29,25 @@ import at.htl_villach.chatapplication.bll.User;
 import at.htl_villach.chatapplication.fragments.ChatroomFragment;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
 public class SingleChatActivity extends AppCompatActivity {
-
-    private Chat currentChat;
-    private User selectedUser;
-
-    FirebaseUser fuser;
-    DatabaseReference referenceUsers;
-    StorageReference storageReference;
     private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
 
-    //toolbar
-    Toolbar toolbar;
-    TextView toolbarTitle;
-    CircleImageView toolbarPicture;
+    //data
+    private Chat mCurrentChat;
+    private User mSelectedUser;
 
+    //database
+    private FirebaseUser mFirebaseUser;
+    private DatabaseReference mUserRef;
+    private StorageReference mStorageRef;
+
+    //toolbar
+    private Toolbar toolbar;
+    private TextView toolbarTitle;
+    private CircleImageView toolbarPicture;
+
+    //Fragment
+    private ChatroomFragment chatroom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,27 +55,27 @@ public class SingleChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_single_chat);
 
         Intent intent = getIntent();
-        currentChat = (Chat) intent.getParcelableExtra("selectedChat");
+        mCurrentChat = (Chat) intent.getParcelableExtra("selectedChat");
 
-        storageReference = FirebaseStorage.getInstance().getReference();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        fuser = FirebaseAuth.getInstance().getCurrentUser();
-        referenceUsers = FirebaseDatabase.getInstance().getReference("Users").child(currentChat.getReceiver(fuser.getUid()));
-        referenceUsers.addValueEventListener(new ValueEventListener() {
+        mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        mUserRef = FirebaseDatabase.getInstance().getReference("Users").child(mCurrentChat.getReceiver(mFirebaseUser.getUid()));
+        mUserRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                selectedUser = snapshot.getValue(User.class);
+                mSelectedUser = snapshot.getValue(User.class);
 
-                //set Layouts with user data
-                toolbarTitle.setText(selectedUser.getFullname());
+                toolbarTitle.setText(mSelectedUser.getFullname());
                 toolbarPicture.post(new Runnable() {
                     @Override
                     public void run() {
-                        storageReference.child("users/" + selectedUser.getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+                        mStorageRef.child("users/" + mSelectedUser.getId() + "/profilePicture.jpg")
+                                .getBytes(MAX_DOWNLOAD_IMAGE)
                                 .addOnSuccessListener(new OnSuccessListener<byte[]>() {
                                     @Override
                                     public void onSuccess(byte[] bytes) {
-                                        selectedUser.setProfilePictureResource(bytes);
+                                        mSelectedUser.setProfilePictureResource(bytes);
                                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                                         toolbarPicture.setImageBitmap(Bitmap.createScaledBitmap(bitmap, toolbarPicture.getWidth(),
                                                 toolbarPicture.getHeight(), false));
@@ -100,30 +103,26 @@ public class SingleChatActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         toolbar.setNavigationIcon(R.drawable.ic_acion_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //startActivity(new Intent(SingleChatActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                finish();
+                startActivity(new Intent(SingleChatActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
-
-        //toDo: loadProfilPicture
-        //toolbarPicture.setImageResource();
 
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(SingleChatActivity.this, ProfileActivity.class);
-                intent.putExtra("selectedContact", selectedUser);
+                intent.putExtra("selectedContact", mSelectedUser);
                 startActivity(intent);
             }
         });
 
-        ChatroomFragment chatroom = (ChatroomFragment) getSupportFragmentManager().findFragmentById(R.id.chatroom);
-
-        chatroom = ChatroomFragment.newInstance(currentChat);
+        chatroom = (ChatroomFragment) getSupportFragmentManager().findFragmentById(R.id.chatroom);
+        chatroom = ChatroomFragment.newInstance(mCurrentChat);
         getSupportFragmentManager().beginTransaction().add(R.id.chatroom, chatroom).commit();
     }
 
@@ -139,7 +138,7 @@ public class SingleChatActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menuChatProfil:
                 Intent intent = new Intent(SingleChatActivity.this, ProfileActivity.class);
-                intent.putExtra("selectedContact", selectedUser);
+                intent.putExtra("selectedContact", mSelectedUser);
                 startActivity(intent);
                 break;
         }

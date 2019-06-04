@@ -4,14 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipToPadding="false"
-    android:paddingVertical="5dp">
+    android:paddingVertical="2dp">
 
     <TextView
         android:id="@+id/message_datetime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:elevation="2dp"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp" />
 
@@ -20,8 +19,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/message_datetime"
-        android:paddingBottom="4dp"
-        android:text="Others"
         android:visibility="gone" />
 
     <com.chauthai.swipereveallayout.SwipeRevealLayout
@@ -39,13 +36,13 @@
 
             <TextView
                 android:id="@+id/message_time"
-                android:layout_width="70dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:gravity="center_vertical|center_horizontal"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="12dp"
-                android:text="12:45"
-                android:textSize="18dp" />
+                android:textSize="15dp" />
         </FrameLayout>
 
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -70,12 +67,12 @@
 
             <ImageView
                 android:id="@+id/message_image"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:background="@drawable/my_message"
+                android:background="@drawable/my_message_image"
                 android:elevation="2dp"
-                android:padding="10dp" />
+                android:padding="3dp" />
         </RelativeLayout>
     </com.chauthai.swipereveallayout.SwipeRevealLayout>
 
@@ -84,9 +81,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/swipe_layout"
-        android:paddingLeft="60dp"
-        android:paddingRight="15dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:paddingLeft="60dp"
+        android:paddingRight="15dp"
         android:visibility="gone" />
 </RelativeLayout>

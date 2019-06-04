@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".MainActivity"
-    android:background="#e6e6e6">
+    android:background="#e6e6e6"
+    tools:context=".MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/bar_layout"
@@ -14,18 +14,18 @@
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_chat"
+            style="@style/MyToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:titleTextAppearance="@style/ToolbarTextAppearance.Title"
+            app:popupTheme="@style/MyPopupTheme"
             app:subtitleTextAppearance="@style/ToolbarTextAppearance.Subtitle"
-            style="@style/MyToolbar"
-            app:popupTheme="@style/MyPopupTheme">
+            app:titleTextAppearance="@style/ToolbarTextAppearance.Title">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/toolbar_profilpicture"
-                android:layout_marginLeft="-20dp"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
+                android:layout_marginLeft="-20dp"
                 android:src="@drawable/standard_picture" />
 
             <TextView
@@ -44,5 +44,4 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/bar_layout" />
-
 </RelativeLayout>
