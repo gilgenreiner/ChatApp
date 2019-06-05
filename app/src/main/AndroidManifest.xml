@@ -14,7 +14,14 @@
         android:roundIcon="@mipmap/icon_app"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SendToActivity"></activity>
+
+        <service android:name=".dal.FirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <activity android:name=".SendMessageToActivity"></activity>
         <activity android:name=".MessageInfoActivity" />
         <activity android:name=".GroupInfoActivity" />
         <activity android:name=".GroupChatActivity" />

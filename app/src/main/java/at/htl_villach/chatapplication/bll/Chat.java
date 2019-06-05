@@ -14,9 +14,6 @@ import java.util.Map;
 public class Chat implements Parcelable {
 
     private String id;
-
-
-
     private Boolean isGroupChat;
     private HashMap<String, Boolean> users;
 
@@ -86,6 +83,16 @@ public class Chat implements Parcelable {
         for (Map.Entry<String, Boolean> entry : users.entrySet()) {
             if(!uid.equals(entry.getKey())){
                 result = entry.getKey();
+            }
+        }
+        return result;
+    }
+
+    public ArrayList<String> getReceivers(String uid) {
+        ArrayList<String> result = new ArrayList<>();
+        for (Map.Entry<String, Boolean> entry : users.entrySet()) {
+            if(!uid.equals(entry.getKey())){
+                result.add(entry.getKey());
             }
         }
         return result;

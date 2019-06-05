@@ -173,6 +173,15 @@ public class AddUserActivity extends AppCompatActivity {
                             }
                         });
 
+                DatabaseReference notificationsRef = FirebaseDatabase.getInstance().getReference("Notifications");
+
+                HashMap<String, Object> hashMapNotifactions = new HashMap<>();
+                hashMapNotifactions.put("sender", firebaseAuth.getCurrentUser().getUid());
+                hashMapNotifactions.put("type", "request");
+                hashMapNotifactions.put("message", "Has send you a friend request");
+
+                notificationsRef.child(userFound.getId()).push().setValue(hashMapNotifactions);
+
             }
         });
 

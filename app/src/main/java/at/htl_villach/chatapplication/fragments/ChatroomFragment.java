@@ -312,7 +312,7 @@ public class ChatroomFragment extends Fragment {
                 for (Message m : mMessages) {
                     if (!m.isSeen()) {
                         if (!messageSeenBy.get(m.getId()).containsValue(false)) {
-                            mRootRef.child("Messages").child(mCurrentChat.getId()).child(m.getId()).child("isseen").setValue(true);
+                            mRootRef.child("Messages").child(mCurrentChat.getId()).child(m.getId()).child("seen").setValue(true);
                         }
                     }
                 }
@@ -328,6 +328,7 @@ public class ChatroomFragment extends Fragment {
     }
 
     private void sendMessage(String message, String type) {
+        //message
         DatabaseReference sendMessagesRef = mRootRef.child("Messages").child(mCurrentChat.getId());
         String messageId = sendMessagesRef.push().getKey();
 
@@ -341,6 +342,7 @@ public class ChatroomFragment extends Fragment {
 
         sendMessagesRef.child(messageId).updateChildren(hashMapMessage);
 
+        //messageSeenBy
         HashMap<String, Object> hashMapMessageSeenBy = new HashMap<>();
         for (Map.Entry<String, Boolean> entry : mCurrentChat.getUsers().entrySet()) {
             if (!entry.getKey().equals(mFirebaseUser.getUid())) {
@@ -349,6 +351,18 @@ public class ChatroomFragment extends Fragment {
         }
 
         mRootRef.child("MessagesSeenBy").child(mCurrentChat.getId()).child(messageId).setValue(hashMapMessageSeenBy);
+
+        //Notifications
+        DatabaseReference notificationsRef = mRootRef.child("Notifications");
+
+        HashMap<String, Object> hashMapNotifactions = new HashMap<>();
+        hashMapNotifactions.put("sender", mFirebaseUser.getUid());
+        hashMapNotifactions.put("type", "message-text");
+        hashMapNotifactions.put("message", message);
+
+        for(String receiver : mCurrentChat.getReceivers(mFirebaseUser.getUid())) {
+            notificationsRef.child(receiver).push().setValue(hashMapNotifactions);
+        }
     }
 
     private void checkPermissionAndTakePhotoIfGranted() {
@@ -415,6 +429,17 @@ public class ChatroomFragment extends Fragment {
                         }
                         mRootRef.child("MessagesSeenBy").child(mCurrentChat.getId()).child(messageId).setValue(hashMapMessageSeenBy);
 
+                        DatabaseReference notificationsRef = mRootRef.child("Notifications");
+
+                        HashMap<String, Object> hashMapNotifactions = new HashMap<>();
+                        hashMapNotifactions.put("sender", mFirebaseUser.getUid());
+                        hashMapNotifactions.put("type", "message-image");
+                        hashMapNotifactions.put("message", ((Uri) urlTask.getResult()).toString());
+
+                        for(String receiver : mCurrentChat.getReceivers(mFirebaseUser.getUid())) {
+                            notificationsRef.child(receiver).push().setValue(hashMapNotifactions);
+                        }
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -461,6 +486,17 @@ public class ChatroomFragment extends Fragment {
                             }
                         }
                         mRootRef.child("MessagesSeenBy").child(mCurrentChat.getId()).child(messageId).setValue(hashMapMessageSeenBy);
+
+                        DatabaseReference notificationsRef = mRootRef.child("Notifications");
+
+                        HashMap<String, Object> hashMapNotifactions = new HashMap<>();
+                        hashMapNotifactions.put("sender", mFirebaseUser.getUid());
+                        hashMapNotifactions.put("type", "message-image");
+                        hashMapNotifactions.put("message", ((Uri) urlTask.getResult()).toString());
+
+                        for(String receiver : mCurrentChat.getReceivers(mFirebaseUser.getUid())) {
+                            notificationsRef.child(receiver).push().setValue(hashMapNotifactions);
+                        }
 
                     }
                 })

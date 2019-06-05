@@ -18,9 +18,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class LoginActivity extends AppCompatActivity {
     DatabaseReference database;
+    DatabaseReference databaseUser;
     FirebaseAuth firebaseAuth;
     boolean allowBack = true;
 
@@ -32,11 +35,13 @@ public class LoginActivity extends AppCompatActivity {
         if (intent.getExtras() != null) {
             allowBack = intent.getExtras().getBoolean("allowBack");
         }
+
+        databaseUser = FirebaseDatabase.getInstance().getReference("Users");
+
         final TextInputLayout txtEmail = findViewById(R.id.txtEmail);
         final TextInputLayout txtPassword = findViewById(R.id.txtPassword);
         final Button btnLogin = findViewById(R.id.btnLogin);
         final Button btnRegister = findViewById(R.id.btnRegister);
-
 
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() != null) {
@@ -57,9 +62,16 @@ public class LoginActivity extends AppCompatActivity {
                             .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                                 @Override
                                 public void onSuccess(AuthResult authResult) {
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(intent);
+                                    //for existing User -> adding the token
+                                    databaseUser.child(firebaseAuth.getCurrentUser().getUid()).child("token").setValue(FirebaseInstanceId.getInstance().getToken()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(intent);
+                                        }
+                                    });
+
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {

@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.HashMap;
 
@@ -94,6 +95,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 newUser.put("email", email);
                                 newUser.put("username", username);
                                 newUser.put("fullname", fullname);
+                                newUser.put("token", FirebaseInstanceId.getInstance().getToken());
 
                                 database.setValue(newUser)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {

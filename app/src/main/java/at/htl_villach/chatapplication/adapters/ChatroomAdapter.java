@@ -32,7 +32,7 @@ import java.util.List;
 
 import at.htl_villach.chatapplication.MessageInfoActivity;
 import at.htl_villach.chatapplication.R;
-import at.htl_villach.chatapplication.SendToActivity;
+import at.htl_villach.chatapplication.SendMessageToActivity;
 import at.htl_villach.chatapplication.bll.Chat;
 import at.htl_villach.chatapplication.bll.Message;
 import at.htl_villach.chatapplication.bll.User;
@@ -281,7 +281,7 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
                     dialog.show();
                     break;
                 case R.id.menuSendMessageTo:
-                    Intent intentSendTo = new Intent(mContext, SendToActivity.class);
+                    Intent intentSendTo = new Intent(mContext, SendMessageToActivity.class);
                     intentSendTo.putExtra("selectedMessage", mSelectedMessage);
                     mContext.startActivity(intentSendTo);
                     break;

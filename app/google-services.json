@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "310412688302-be4jspctqpas63q03vs3qjstct7udjeo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "at.htl_villach.chatapplication",
+            "certificate_hash": "aae8d74ae4b1346453750b62a3bcb63f1d2e2618"
+          }
+        },
+        {
+          "client_id": "310412688302-d48mjcqcp0c30ihjem5umrfqthns0aqa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "at.htl_villach.chatapplication",
+            "certificate_hash": "632e9311f395573f663af3ede23143afaea8029c"
+          }
+        },
+        {
           "client_id": "310412688302-3vuniidko7or2l41dn5aunljfii3mr5v.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

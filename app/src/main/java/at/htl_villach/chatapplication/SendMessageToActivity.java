@@ -19,7 +19,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ import at.htl_villach.chatapplication.adapters.ChatListAdapter;
 import at.htl_villach.chatapplication.bll.Chat;
 import at.htl_villach.chatapplication.bll.Message;
 
-public class SendToActivity extends AppCompatActivity {
+public class SendMessageToActivity extends AppCompatActivity {
     //toolbar
     private Toolbar toolbar;
 
@@ -91,7 +90,7 @@ public class SendToActivity extends AppCompatActivity {
         tvTime = findViewById(R.id.message_time);
         tvTime.setText(mSelectedMessage.getTimeAsString());
 
-        adapter = new ChatListAdapter(SendToActivity.this, mChats);
+        adapter = new ChatListAdapter(SendMessageToActivity.this, mChats);
 
         lvUser = findViewById(R.id.list);
         lvUser.setAdapter(adapter);
@@ -102,7 +101,7 @@ public class SendToActivity extends AppCompatActivity {
                                     long arg3) {
                 final Chat chat = (Chat) adapter.getItemAtPosition(position);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(SendToActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(SendMessageToActivity.this);
 
                 builder.setPositiveButton(R.string.popUpBtnYes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -140,7 +139,7 @@ public class SendToActivity extends AppCompatActivity {
                 String content = (mSelectedMessage.getType().equals("text")) ? "message " + mSelectedMessage.getMessage() : "image";
 
                 builder.setTitle(R.string.sendToPopUpTitle);
-                builder.setMessage(SendToActivity.this.getResources().getString(R.string.sendToPopUpMessage, content));
+                builder.setMessage(SendMessageToActivity.this.getResources().getString(R.string.sendToPopUpMessage, content));
 
                 AlertDialog dialog = builder.create();
 
