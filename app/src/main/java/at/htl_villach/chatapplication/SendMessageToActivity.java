@@ -43,7 +43,7 @@ public class SendMessageToActivity extends AppCompatActivity {
 
     //database
     private DatabaseReference mRootRef;
-    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth mFirebaseUser;
 
     //data
     private Message mSelectedMessage;
@@ -57,7 +57,7 @@ public class SendMessageToActivity extends AppCompatActivity {
         setContentView(R.layout.activity_message_info);
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
-        firebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = FirebaseAuth.getInstance();
 
         mSelectedMessage = getIntent().getParcelableExtra("selectedMessage");
 
@@ -105,12 +105,13 @@ public class SendMessageToActivity extends AppCompatActivity {
 
                 builder.setPositiveButton(R.string.popUpBtnYes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        //Message
                         DatabaseReference sendMessagesRef = mRootRef.child("Messages").child(chat.getId());
                         String messageId = sendMessagesRef.push().getKey();
 
                         HashMap<String, Object> hashMapMessage = new HashMap<>();
                         hashMapMessage.put("id", messageId);
-                        hashMapMessage.put("sender", firebaseAuth.getCurrentUser().getUid());
+                        hashMapMessage.put("sender", mFirebaseUser.getCurrentUser().getUid());
                         hashMapMessage.put("message", mSelectedMessage.getMessage());
                         hashMapMessage.put("type", mSelectedMessage.getType());
                         hashMapMessage.put("timestamp", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
@@ -118,13 +119,25 @@ public class SendMessageToActivity extends AppCompatActivity {
 
                         sendMessagesRef.child(messageId).updateChildren(hashMapMessage);
 
+                        //MessageSeenBy
                         HashMap<String, Object> hashMapMessageSeenBy = new HashMap<>();
                         for (Map.Entry<String, Boolean> entry : chat.getUsers().entrySet()) {
-                            if (!entry.getKey().equals(firebaseAuth.getCurrentUser().getUid())) {
+                            if (!entry.getKey().equals(mFirebaseUser.getCurrentUser().getUid())) {
                                 hashMapMessageSeenBy.put(entry.getKey(), false);
                             }
                         }
+
                         mRootRef.child("MessagesSeenBy").child(chat.getId()).child(messageId).setValue(hashMapMessageSeenBy);
+
+                        //Notification
+                        HashMap<String, Object> hashMapNotifications = new HashMap<>();
+                        hashMapNotifications.put("sender", mFirebaseUser.getCurrentUser().getUid());
+                        hashMapNotifications.put("type", "message");
+                        hashMapNotifications.put("message", (mSelectedMessage.getType().equals("text")) ? mSelectedMessage.getMessage() : "Picture");
+
+                        for (String receiver : chat.getReceivers(mFirebaseUser.getUid())) {
+                            mRootRef.child("Notifications").child(receiver).push().setValue(hashMapNotifications);
+                        }
 
                         finish();
                     }
@@ -156,7 +169,7 @@ public class SendMessageToActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         ArrayList<Chat> tempChat = new ArrayList<>();
                         HashMap<String, Object> chats = (HashMap<String, Object>) dataSnapshot.getValue();
-                        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+                        FirebaseUser currentUser = mFirebaseUser.getCurrentUser();
                         if (chats != null) {
                             for (String key : chats.keySet()) {
                                 HashMap<String, Object> curObj = (HashMap<String, Object>) chats.get(key);

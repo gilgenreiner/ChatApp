@@ -109,7 +109,6 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
                     .resize(0, 800)
                     .centerCrop()
                     .into(holder.image);
-
         }
 
         //time when message had been send
@@ -164,7 +163,7 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
 
             @Override
             public boolean onLongClick(View v) {
-                if (mActionMode == null) {
+                if (mActionMode == null && !holder.swipeLayout.isOpened()) {
                     mSelectedMessage = m;
                     mActionMode = ((Activity) mContext).startActionMode(new ActionBarCallback());
                 } else {
@@ -226,12 +225,6 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ViewHo
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             mode.getMenuInflater().inflate(R.menu.menu_contextual_chat, menu);
-
-            if (!mCurrentChat.getGroupChat()) {
-                menu.findItem(R.id.menuMessageInfo).setVisible(false);
-            } else {
-                menu.findItem(R.id.menuMessageInfo).setVisible(true);
-            }
 
             if (!mSelectedMessage.getSender().equals(fuser.getUid())) {
                 menu.findItem(R.id.menuDeleteMessage).setVisible(false);

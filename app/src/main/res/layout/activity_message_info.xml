@@ -13,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:popupTheme="@style/MyPopupTheme"
-        app:subtitleTextAppearance="@style/ToolbarTextAppearance.Subtitle"
         app:title="@string/messageInfo"
         app:titleTextAppearance="@style/ToolbarTextAppearance.Title" />
 
@@ -22,7 +21,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/toolbar"
-
         android:layout_marginLeft="40dp"
         android:layout_marginTop="20dp"
         android:layout_marginRight="20dp"

@@ -30,6 +30,7 @@ import java.util.HashMap;
 
 import at.htl_villach.chatapplication.R;
 import at.htl_villach.chatapplication.bll.Chat;
+import at.htl_villach.chatapplication.bll.Message;
 import at.htl_villach.chatapplication.bll.User;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -38,6 +39,7 @@ public class ChatListAdapter extends BaseAdapter {
     LayoutInflater inflater;
     DatabaseReference database;
     DatabaseReference database2;
+    DatabaseReference database3;
     FirebaseAuth firebaseAuth;
     StorageReference storageReference;
     private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
@@ -68,12 +70,13 @@ public class ChatListAdapter extends BaseAdapter {
     public View getView(final int i, View view, ViewGroup viewGroup) {
         view = inflater.inflate(R.layout.activity_list_chats, null);
         final TextView item = view.findViewById(R.id.txtName);
-        TextView subitem = view.findViewById(R.id.txtLastChat);
+        final TextView subitem = view.findViewById(R.id.txtLastChat);
 
         final CircleImageView image = (CircleImageView) view.findViewById(R.id.list_picture);
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("Users");
         database2 = FirebaseDatabase.getInstance().getReference("Groups");
+        database3 = FirebaseDatabase.getInstance().getReference("Messages");
         storageReference = FirebaseStorage.getInstance().getReference();
 
         if (contacts.get(i).getGroupChat()) {
@@ -172,15 +175,28 @@ public class ChatListAdapter extends BaseAdapter {
             });
         }
 
+        subitem.setText("no messages has been send");
 
-        //subitem.setText(contacts.get(i).getUsername());
+        database3.child(contacts.get(i).getId()).limitToLast(1).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Message m = ds.getValue(Message.class);
 
-        //if(contacts.get(i).getProfilePicture() == 0) {
-        //    image.setImageResource(R.drawable.standard_picture);
-        //}
+                    if(m.getType().equals("text")) {
+                        subitem.setText(m.getMessage());
+                    }else {
+                        subitem.setText(R.string.picture);
+                    }
+                }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-        //image.setImageResource(flags[i]);
+            }
+        });
+
         return view;
     }
 

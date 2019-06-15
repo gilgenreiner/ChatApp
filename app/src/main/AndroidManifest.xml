@@ -21,10 +21,18 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".SendMessageToActivity"></activity>
-        <activity android:name=".MessageInfoActivity" />
-        <activity android:name=".GroupInfoActivity" />
-        <activity android:name=".GroupChatActivity" />
+        <activity
+            android:name=".SendMessageToActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".MessageInfoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupInfoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupChatActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait">

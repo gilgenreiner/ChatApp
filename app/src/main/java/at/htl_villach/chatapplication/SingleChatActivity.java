@@ -129,14 +129,14 @@ public class SingleChatActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_chat, menu);
+        getMenuInflater().inflate(R.menu.menu_chatroom, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menuChatProfil:
+            case R.id.menu_MoreInformation:
                 Intent intent = new Intent(SingleChatActivity.this, ProfileActivity.class);
                 intent.putExtra("selectedContact", mSelectedUser);
                 startActivity(intent);

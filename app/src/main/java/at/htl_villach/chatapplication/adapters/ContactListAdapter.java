@@ -87,23 +87,30 @@ public class ContactListAdapter extends BaseAdapter {
 
         subitem.setText(contacts.get(i).getUsername());
 
-        storageReference.child("users/" + thisUser.getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
-                .addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                    @Override
-                    public void onSuccess(byte[] bytes) {
-                        contacts.get(i).setProfilePictureResource(bytes);
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, image.getWidth(),
-                                image.getHeight(), false));
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        image.setImageResource(R.drawable.standard_picture);
-                    }
-                });
+        image.post(new Runnable() {
+            @Override
+            public void run() {
+                storageReference.child("users/" + thisUser.getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+                        .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                            @Override
+                            public void onSuccess(byte[] bytes) {
+                                contacts.get(i).setProfilePictureResource(bytes);
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, image.getWidth(),
+                                        image.getHeight(), false));
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                image.setImageResource(R.drawable.standard_picture);
+                            }
+                        });
 
+
+            }
+
+        });
 
 
         imageNewChat.setOnClickListener(new View.OnClickListener() {

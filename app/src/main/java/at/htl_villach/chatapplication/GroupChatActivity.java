@@ -47,7 +47,6 @@ public class GroupChatActivity extends AppCompatActivity {
 
     //Data
     private Chat mCurrentChat;
-    private ArrayList<User> mGroupUsers = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +57,6 @@ public class GroupChatActivity extends AppCompatActivity {
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
-
-        setGroupchatUsers();
 
         DatabaseReference referenceGroupchat = mRootRef.child("Groups").child(mCurrentChat.getId());
         referenceGroupchat.addValueEventListener(new ValueEventListener() {
@@ -126,42 +123,24 @@ public class GroupChatActivity extends AppCompatActivity {
         chatroom = (ChatroomFragment) getSupportFragmentManager().findFragmentById(R.id.chatroom);
         chatroom = ChatroomFragment.newInstance(mCurrentChat);
         getSupportFragmentManager().beginTransaction().add(R.id.chatroom, chatroom).commit();
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.menu_chat, menu);
+        getMenuInflater().inflate(R.menu.menu_chatroom, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menuChatProfil:
+            case R.id.menu_MoreInformation:
                 Intent intent = new Intent(GroupChatActivity.this, GroupInfoActivity.class);
                 intent.putExtra("groupChat", mCurrentChat);
                 startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void setGroupchatUsers() {
-        for (String key : mCurrentChat.getUsers().keySet()) {
-            DatabaseReference referenceUsers = mRootRef.child("Users").child(key);
-            referenceUsers.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    mGroupUsers.add(snapshot.getValue(User.class));
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    System.out.println("The read failed: " + databaseError.getCode());
-                }
-            });
-        }
     }
 }

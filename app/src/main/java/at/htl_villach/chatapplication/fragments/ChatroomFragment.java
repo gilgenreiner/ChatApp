@@ -295,7 +295,8 @@ public class ChatroomFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                System.out.println("The read failed: " + databaseError.getCode());
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
 
@@ -353,15 +354,13 @@ public class ChatroomFragment extends Fragment {
         mRootRef.child("MessagesSeenBy").child(mCurrentChat.getId()).child(messageId).setValue(hashMapMessageSeenBy);
 
         //Notifications
-        DatabaseReference notificationsRef = mRootRef.child("Notifications");
+        HashMap<String, Object> hashMapNotifications = new HashMap<>();
+        hashMapNotifications.put("sender", mFirebaseUser.getUid());
+        hashMapNotifications.put("type", "message");
+        hashMapNotifications.put("message", message);
 
-        HashMap<String, Object> hashMapNotifactions = new HashMap<>();
-        hashMapNotifactions.put("sender", mFirebaseUser.getUid());
-        hashMapNotifactions.put("type", "message-text");
-        hashMapNotifactions.put("message", message);
-
-        for(String receiver : mCurrentChat.getReceivers(mFirebaseUser.getUid())) {
-            notificationsRef.child(receiver).push().setValue(hashMapNotifactions);
+        for (String receiver : mCurrentChat.getReceivers(mFirebaseUser.getUid())) {
+            mRootRef.child("Notifications").child(receiver).push().setValue(hashMapNotifications);
         }
     }
 
@@ -411,6 +410,7 @@ public class ChatroomFragment extends Fragment {
                         Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
                         while (!urlTask.isSuccessful()) ;
 
+                        //Message
                         HashMap<String, Object> hashMapMessage = new HashMap<>();
                         hashMapMessage.put("id", messageId);
                         hashMapMessage.put("sender", mFirebaseUser.getUid());
@@ -421,6 +421,7 @@ public class ChatroomFragment extends Fragment {
 
                         sendMessagesRef.child(messageId).updateChildren(hashMapMessage);
 
+                        //MessageSeenBy
                         HashMap<String, Object> hashMapMessageSeenBy = new HashMap<>();
                         for (Map.Entry<String, Boolean> entry : mCurrentChat.getUsers().entrySet()) {
                             if (!entry.getKey().equals(mFirebaseUser.getUid())) {
@@ -429,17 +430,15 @@ public class ChatroomFragment extends Fragment {
                         }
                         mRootRef.child("MessagesSeenBy").child(mCurrentChat.getId()).child(messageId).setValue(hashMapMessageSeenBy);
 
-                        DatabaseReference notificationsRef = mRootRef.child("Notifications");
+                        //Notifications
+                        HashMap<String, Object> hashMapNotifications = new HashMap<>();
+                        hashMapNotifications.put("sender", mFirebaseUser.getUid());
+                        hashMapNotifications.put("type", "message");
+                        hashMapNotifications.put("message", "Picture");
 
-                        HashMap<String, Object> hashMapNotifactions = new HashMap<>();
-                        hashMapNotifactions.put("sender", mFirebaseUser.getUid());
-                        hashMapNotifactions.put("type", "message-image");
-                        hashMapNotifactions.put("message", ((Uri) urlTask.getResult()).toString());
-
-                        for(String receiver : mCurrentChat.getReceivers(mFirebaseUser.getUid())) {
-                            notificationsRef.child(receiver).push().setValue(hashMapNotifactions);
+                        for (String receiver : mCurrentChat.getReceivers(mFirebaseUser.getUid())) {
+                            mRootRef.child("Notifications").child(receiver).push().setValue(hashMapNotifications);
                         }
-
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -469,6 +468,7 @@ public class ChatroomFragment extends Fragment {
                         Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
                         while (!urlTask.isSuccessful()) ;
 
+                        //Message
                         HashMap<String, Object> hashMapMessage = new HashMap<>();
                         hashMapMessage.put("id", messageId);
                         hashMapMessage.put("sender", mFirebaseUser.getUid());
@@ -479,6 +479,7 @@ public class ChatroomFragment extends Fragment {
 
                         sendMessagesRef.child(messageId).updateChildren(hashMapMessage);
 
+                        //MessageSeenBy
                         HashMap<String, Object> hashMapMessageSeenBy = new HashMap<>();
                         for (Map.Entry<String, Boolean> entry : mCurrentChat.getUsers().entrySet()) {
                             if (!entry.getKey().equals(mFirebaseUser.getUid())) {
@@ -487,17 +488,15 @@ public class ChatroomFragment extends Fragment {
                         }
                         mRootRef.child("MessagesSeenBy").child(mCurrentChat.getId()).child(messageId).setValue(hashMapMessageSeenBy);
 
-                        DatabaseReference notificationsRef = mRootRef.child("Notifications");
+                        //Notifications
+                        HashMap<String, Object> hashMapNotifications = new HashMap<>();
+                        hashMapNotifications.put("sender", mFirebaseUser.getUid());
+                        hashMapNotifications.put("type", "message");
+                        hashMapNotifications.put("message", "Picture");
 
-                        HashMap<String, Object> hashMapNotifactions = new HashMap<>();
-                        hashMapNotifactions.put("sender", mFirebaseUser.getUid());
-                        hashMapNotifactions.put("type", "message-image");
-                        hashMapNotifactions.put("message", ((Uri) urlTask.getResult()).toString());
-
-                        for(String receiver : mCurrentChat.getReceivers(mFirebaseUser.getUid())) {
-                            notificationsRef.child(receiver).push().setValue(hashMapNotifactions);
+                        for (String receiver : mCurrentChat.getReceivers(mFirebaseUser.getUid())) {
+                            mRootRef.child("Notifications").child(receiver).push().setValue(hashMapNotifications);
                         }
-
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

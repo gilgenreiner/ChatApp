@@ -71,69 +71,69 @@ public class AddUserActivity extends AppCompatActivity {
                 layout_user_found.setVisibility(View.INVISIBLE);
                 btnAddUser.setVisibility(View.VISIBLE);
                 imgCheck.setVisibility(View.INVISIBLE);
-                if(!input.isEmpty()) {
+                if (!input.isEmpty()) {
                     database.orderByChild("username")
-                                .equalTo(input)
-                                .addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        HashMap<String, HashMap<String,String>> user = (HashMap<String,HashMap<String,String>>) dataSnapshot.getValue();
-                                        if(user != null) {
-                                            final User userObject = new User();
-                                            for(String key : user.keySet()) {
-                                                userObject.setUsername(user.get(key).get("username"));
-                                                userObject.setFullname(user.get(key).get("fullname"));
-                                                userObject.setEmail(user.get(key).get("email"));
-                                                userObject.setId(user.get(key).get("id"));
-                                            }
-
-                                            database.child(firebaseAuth.getCurrentUser().getUid()).child("friends")
-                                                    .addValueEventListener(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                            HashMap<String, Boolean> friends = (HashMap<String, Boolean>) dataSnapshot.getValue();
-                                                            boolean alreadyAdded = false;
-                                                            if (friends != null) {
-                                                                for (String key : friends.keySet()) {
-                                                                    if (key.equals(userObject.getId())) {
-                                                                        alreadyAdded = true;
-                                                                    }
-                                                                }
-                                                            }
-
-                                                            if (alreadyAdded) {
-                                                                btnAddUser.setVisibility(View.INVISIBLE);
-                                                                imgCheck.setVisibility(View.VISIBLE);
-                                                            }
-                                                            if(!firebaseAuth.getCurrentUser().getUid().equals(userObject.getId())) {
-                                                                layout_user_found.setVisibility(View.VISIBLE);
-                                                                txtFullName.setText(userObject.getFullname());
-                                                                txtUsername.setText(userObject.getUsername());
-                                                                userFound = userObject;
-                                                            } else {
-                                                                Toast.makeText(getApplicationContext(), "You cannot add yourself", Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        }
-
-                                                        @Override
-                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                        }
-                                                    });
-
-
+                            .equalTo(input)
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    HashMap<String, HashMap<String, String>> user = (HashMap<String, HashMap<String, String>>) dataSnapshot.getValue();
+                                    if (user != null) {
+                                        final User userObject = new User();
+                                        for (String key : user.keySet()) {
+                                            userObject.setUsername(user.get(key).get("username"));
+                                            userObject.setFullname(user.get(key).get("fullname"));
+                                            userObject.setEmail(user.get(key).get("email"));
+                                            userObject.setId(user.get(key).get("id"));
                                         }
 
+                                        database.child(firebaseAuth.getCurrentUser().getUid()).child("friends")
+                                                .addValueEventListener(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        HashMap<String, Boolean> friends = (HashMap<String, Boolean>) dataSnapshot.getValue();
+                                                        boolean alreadyAdded = false;
+                                                        if (friends != null) {
+                                                            for (String key : friends.keySet()) {
+                                                                if (key.equals(userObject.getId())) {
+                                                                    alreadyAdded = true;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if (alreadyAdded) {
+                                                            btnAddUser.setVisibility(View.INVISIBLE);
+                                                            imgCheck.setVisibility(View.VISIBLE);
+                                                        }
+                                                        if (!firebaseAuth.getCurrentUser().getUid().equals(userObject.getId())) {
+                                                            layout_user_found.setVisibility(View.VISIBLE);
+                                                            txtFullName.setText(userObject.getFullname());
+                                                            txtUsername.setText(userObject.getUsername());
+                                                            userFound = userObject;
+                                                        } else {
+                                                            Toast.makeText(getApplicationContext(), "You cannot add yourself", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+
 
                                     }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                    }
-                                });
+                                }
 
-                    }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+
+                }
 
                 return false;
             }

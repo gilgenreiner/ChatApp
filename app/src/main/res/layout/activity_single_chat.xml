@@ -18,7 +18,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:popupTheme="@style/MyPopupTheme"
-            app:subtitleTextAppearance="@style/ToolbarTextAppearance.Subtitle"
             app:titleTextAppearance="@style/ToolbarTextAppearance.Title">
 
             <de.hdodenhof.circleimageview.CircleImageView
@@ -32,8 +31,9 @@
                 android:id="@+id/toolbar_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxLines="1"
                 android:paddingLeft="10dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textAppearance="@style/ToolbarTextAppearance.Title"
                 android:textColor="#fff" />
 
         </android.support.v7.widget.Toolbar>
