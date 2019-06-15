@@ -1,6 +1,8 @@
 package at.htl_villach.chatapplication.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -17,6 +21,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -24,6 +30,7 @@ import java.util.HashMap;
 
 import at.htl_villach.chatapplication.R;
 import at.htl_villach.chatapplication.bll.User;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class RequestListAdapter extends BaseAdapter {
 
@@ -32,6 +39,8 @@ public class RequestListAdapter extends BaseAdapter {
     private DatabaseReference database;
     private DatabaseReference database2;
     private FirebaseAuth firebaseAuth;
+    StorageReference storageReference;
+    private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
 
     public RequestListAdapter(Context applicationContext, ArrayList<String> requestUid) {
         this.requestUid = requestUid;
@@ -60,11 +69,12 @@ public class RequestListAdapter extends BaseAdapter {
 
         database = FirebaseDatabase.getInstance().getReference("Users");
         database2 = FirebaseDatabase.getInstance().getReference("Requests");
-       firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         final TextView item = convertView.findViewById(R.id.txtName);
         final TextView subitem = convertView.findViewById(R.id.txtUsername);
-
+        final CircleImageView image = convertView.findViewById(R.id.list_picture);
         //item.setText(requestUid.get(position).getFullname());
         //subitem.setText(requestUid.get(position).getUsername());
 
@@ -84,6 +94,28 @@ public class RequestListAdapter extends BaseAdapter {
                             }
                             item.setText(userObject.getFullname());
                             subitem.setText(userObject.getUsername());
+
+                            image.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    storageReference.child("users/" + userObject.getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+                                            .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                                @Override
+                                                public void onSuccess(byte[] bytes) {
+                                                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                                    image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, image.getWidth(),
+                                                            image.getHeight(), false));
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    image.setImageResource(R.drawable.standard_picture);
+                                                }
+                                            });
+                                }
+                            });
+
                         }
 
                     }
@@ -103,16 +135,16 @@ public class RequestListAdapter extends BaseAdapter {
             public void onClick(View v) {
                 database2.child(firebaseAuth.getCurrentUser().getUid())
                         .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        dataSnapshot.getRef().removeValue();
-                    }
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                dataSnapshot.getRef().removeValue();
+                            }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-                });
+                            }
+                        });
             }
         });
 

@@ -2,6 +2,8 @@ package at.htl_villach.chatapplication;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -22,14 +26,20 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 
 import at.htl_villach.chatapplication.bll.User;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AddUserActivity extends AppCompatActivity {
+    private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
+
     DatabaseReference database;
     DatabaseReference database2;
+    StorageReference storageReference;
     FirebaseAuth firebaseAuth;
     User userFound;
 
@@ -49,12 +59,14 @@ public class AddUserActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("Users");
         database2 = FirebaseDatabase.getInstance().getReference("Requests");
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         final LinearLayout layout_user_found = findViewById(R.id.layout_user_found);
         final TextView txtFullName = findViewById(R.id.txtFullName);
         final TextView txtUsername = findViewById(R.id.txtUsername);
         final Button btnAddUser = findViewById(R.id.btnAddUser);
         final ImageView imgCheck = findViewById(R.id.imgCheck);
+        final CircleImageView imageUser = findViewById(R.id.imageUser);
 
         layout_user_found.setVisibility(View.INVISIBLE);
         imgCheck.setVisibility(View.INVISIBLE);
@@ -109,6 +121,26 @@ public class AddUserActivity extends AppCompatActivity {
                                                             layout_user_found.setVisibility(View.VISIBLE);
                                                             txtFullName.setText(userObject.getFullname());
                                                             txtUsername.setText(userObject.getUsername());
+                                                            imageUser.post(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    storageReference.child("users/" + userObject.getId() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
+                                                                            .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                                                                @Override
+                                                                                public void onSuccess(byte[] bytes) {
+                                                                                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                                                                    imageUser.setImageBitmap(Bitmap.createScaledBitmap(bitmap, imageUser.getWidth(),
+                                                                                            imageUser.getHeight(), false));
+                                                                                }
+                                                                            })
+                                                                            .addOnFailureListener(new OnFailureListener() {
+                                                                                @Override
+                                                                                public void onFailure(@NonNull Exception e) {
+                                                                                    imageUser.setImageResource(R.drawable.standard_picture);
+                                                                                }
+                                                                            });
+                                                                }
+                                                            });
                                                             userFound = userObject;
                                                         } else {
                                                             Toast.makeText(getApplicationContext(), "You cannot add yourself", Toast.LENGTH_SHORT).show();

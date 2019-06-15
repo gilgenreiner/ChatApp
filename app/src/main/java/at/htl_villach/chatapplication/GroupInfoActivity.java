@@ -64,6 +64,7 @@ import java.util.HashMap;
 import at.htl_villach.chatapplication.adapters.ContactListAdapter;
 import at.htl_villach.chatapplication.bll.Chat;
 import at.htl_villach.chatapplication.bll.User;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class GroupInfoActivity extends AppCompatActivity {
 
@@ -75,7 +76,7 @@ public class GroupInfoActivity extends AppCompatActivity {
     private Chat groupChat;
     private ContactListAdapter adapter;
     private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
-    private ImageView imgGroupPicture;
+    private CircleImageView imgGroupPicture;
     private Uri imageUri;
     private Toolbar toolGroupName;
     private EditText editGroupName;
@@ -121,7 +122,7 @@ public class GroupInfoActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
 
-        adapter = new ContactListAdapter(getApplicationContext(), arrUsers);
+        adapter = new ContactListAdapter(GroupInfoActivity.this, arrUsers);
         listMembers.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 

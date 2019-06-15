@@ -1,33 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="20dp"
     tools:context=".EditProfileActivity">
 
-
-    <com.mikhaellopez.circularimageview.CircularImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profilePicture"
         android:layout_width="150dp"
         android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
         android:src="@drawable/standard_picture"
-        app:civ_border_color="#EEEEEE"
-        app:civ_border_width="4dp"
-        app:civ_shadow="true"
-        app:civ_shadow_color="@color/colorPrimary"
-        app:civ_shadow_radius="10" />
+        android:elevation="2dp"/>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/txtFullName"
         style="@style/TILStyle"
-        android:layout_width="350dp"
+        android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="8dp"
         android:hint="@string/hint_fullname">
 
@@ -41,7 +37,7 @@
     <android.support.design.widget.TextInputLayout
         android:id="@+id/txtUsername"
         style="@style/TILStyle"
-        android:layout_width="350dp"
+        android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -56,8 +52,6 @@
     </android.support.design.widget.TextInputLayout>
 
 
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,19 +64,18 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
+            android:onClick="onCancel"
             android:text="@string/btnCancel"
-            android:theme="@style/MyButton"
-            android:onClick="onCancel"/>
+            android:theme="@style/MyButton" />
 
         <Button
             android:id="@+id/btnSaveEditedProfile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginLeft="170dp"
+            android:onClick="saveProfile"
             android:text="@string/btnSaveEditedProfile"
-            android:theme="@style/MyButton"
-            android:onClick="saveProfile"/>
+            android:theme="@style/MyButton" />
     </LinearLayout>
 
 

@@ -25,6 +25,7 @@
     <style name="MyButton" parent="Theme.AppCompat.Light">
         <item name="colorControlHighlight">@color/colorPrimaryDark</item>
         <item name="colorButtonNormal">@color/colorPrimary</item>
+        <item name="android:textColor">@color/textColorWhite</item>
     </style>
 
     <style name="MyButtonBorderless" parent="Theme.AppCompat.Light">

@@ -41,7 +41,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,6 +48,7 @@ import java.io.FileOutputStream;
 import java.util.HashMap;
 
 import at.htl_villach.chatapplication.bll.User;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class EditProfileActivity extends AppCompatActivity {
     private static final int REQUEST_TAKE_PHOTO = 1;
@@ -61,7 +61,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private StorageReference storageReference;
     public static final int PICK_IMAGE = 1;
     public static final int TAKE_PICTURE = 2;
-    CircularImageView profilePicture;
+    CircleImageView profilePicture;
     FirebaseAuth firebaseAuth;
     FirebaseUser user;
     TextInputEditText etxtUsername;
@@ -69,11 +69,12 @@ public class EditProfileActivity extends AppCompatActivity {
     private Uri imageUri;
 
     private final long MAX_DOWNLOAD_IMAGE = 1024 * 1024 * 5;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
-        profilePicture = (CircularImageView) findViewById(R.id.profilePicture);
+        profilePicture = (CircleImageView) findViewById(R.id.profilePicture);
         storageReference = FirebaseStorage.getInstance().getReference();
 
 
@@ -84,7 +85,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 builder.setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch(which) {
+                        switch (which) {
                             case 0:
                                 checkPermissionAndPickPhotoIfGranted();
                                 break;
@@ -126,20 +127,20 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void loadImage() {
         storageReference.child("users/" + user.getUid() + "/profilePicture.jpg").getBytes(MAX_DOWNLOAD_IMAGE)
-        .addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                profilePicture.setImageBitmap(Bitmap.createScaledBitmap(bitmap, profilePicture.getWidth(),
-                        profilePicture.getHeight(), false));
-            }
-        })
-        .addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                profilePicture.setImageResource(R.drawable.standard_picture);
-            }
-        });
+                .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        profilePicture.setImageBitmap(Bitmap.createScaledBitmap(bitmap, profilePicture.getWidth(),
+                                profilePicture.getHeight(), false));
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        profilePicture.setImageResource(R.drawable.standard_picture);
+                    }
+                });
     }
 
     private void fillTextfields(String uid) {
@@ -166,7 +167,7 @@ public class EditProfileActivity extends AppCompatActivity {
         HashMap<String, Object> updateUser = new HashMap<>();
         updateUser.put("username", etxtUsername.getText().toString());
         updateUser.put("fullname", etxtFullname.getText().toString());
-        FirebaseDatabase.getInstance().getReference().child("Users").child( user.getUid()).updateChildren(updateUser);
+        FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).updateChildren(updateUser);
         Intent intent = new Intent(EditProfileActivity.this, MainActivity.class);
         intent.putExtra("allowBack", false);
         startActivity(intent);
@@ -180,7 +181,7 @@ public class EditProfileActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         try {
-            if(resultCode == Activity.RESULT_OK) {
+            if (resultCode == Activity.RESULT_OK) {
                 if (requestCode == PICK_IMAGE) {
                     imageUri = data.getData();
                     checkOrientation();
@@ -193,7 +194,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
                 }
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             Log.e("app", "onActivityResult", ex);
             Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
         }
@@ -201,16 +202,16 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void checkOrientation() throws Exception {
-        String[] filePathColumn = { MediaStore.Images.Media.DATA };
+        String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
         String filePath;
 
-        Cursor cursor = getApplicationContext().getContentResolver().query( imageUri, filePathColumn, null, null, null );
-        if(cursor != null) {
+        Cursor cursor = getApplicationContext().getContentResolver().query(imageUri, filePathColumn, null, null, null);
+        if (cursor != null) {
             cursor.moveToFirst();
 
-            int columnIndex = cursor.getColumnIndex( filePathColumn[0] );
-            filePath = cursor.getString( columnIndex );
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            filePath = cursor.getString(columnIndex);
             cursor.close();
         } else {
             filePath = imageUri.getPath();
@@ -222,7 +223,7 @@ public class EditProfileActivity extends AppCompatActivity {
         Bitmap bitmap = BitmapFactory.decodeFile(filePath);
         bitmap = createSquaredBitmap(bitmap);
 
-        if(orientation == 6) {
+        if (orientation == 6) {
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
             Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
@@ -278,7 +279,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private void checkPermissionAndTakePhotoIfGranted() {
         int permission = ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        if(permission != PackageManager.PERMISSION_GRANTED) {
+        if (permission != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(EditProfileActivity.this, PERMISSIONS_STORAGE, REQUEST_TAKE_PHOTO);
         } else {
             captureImage();
@@ -288,13 +289,12 @@ public class EditProfileActivity extends AppCompatActivity {
     private void checkPermissionAndPickPhotoIfGranted() {
         int permission = ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        if(permission != PackageManager.PERMISSION_GRANTED) {
+        if (permission != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(EditProfileActivity.this, PERMISSIONS_STORAGE, REQUEST_PICK_PHOTO);
         } else {
             pickImage();
         }
     }
-
 
 
     private void captureImage() {
@@ -311,14 +311,14 @@ public class EditProfileActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == REQUEST_TAKE_PHOTO) {
+        if (requestCode == REQUEST_TAKE_PHOTO) {
             int permission = ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if(permission == PackageManager.PERMISSION_GRANTED) {
+            if (permission == PackageManager.PERMISSION_GRANTED) {
                 captureImage();
             }
-        } else if(requestCode == REQUEST_PICK_PHOTO) {
+        } else if (requestCode == REQUEST_PICK_PHOTO) {
             int permission = ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if(permission == PackageManager.PERMISSION_GRANTED) {
+            if (permission == PackageManager.PERMISSION_GRANTED) {
                 pickImage();
             }
         }

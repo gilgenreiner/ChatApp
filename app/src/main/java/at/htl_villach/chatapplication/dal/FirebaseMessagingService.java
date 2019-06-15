@@ -32,11 +32,9 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         int mNotificationId = (int) System.currentTimeMillis();
 
         oreoNotification.getManager().notify(mNotificationId, builder.build());
-
     }
 
     private void sendNotification(RemoteMessage remoteMessage) {
-
         String notification_title = remoteMessage.getNotification().getTitle();
         String notification_message = remoteMessage.getNotification().getBody();
 

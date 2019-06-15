@@ -30,8 +30,9 @@ import at.htl_villach.chatapplication.bll.User;
 public class popupDeleteDialogActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     FirebaseUser user;
-    String userId ;
-    String email ;
+    String userId;
+    String email;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +44,7 @@ public class popupDeleteDialogActivity extends AppCompatActivity {
         int width = dm.widthPixels;
         int heigth = dm.heightPixels;
 
-        getWindow().setLayout((int) (width*1), (int) (heigth*0.3));
+        getWindow().setLayout((int) (width * 1), (int) (heigth * 0.32));
         firebaseAuth = FirebaseAuth.getInstance().getInstance();
     }
 
@@ -51,7 +52,7 @@ public class popupDeleteDialogActivity extends AppCompatActivity {
 
         final TextInputLayout txtPassword = findViewById(R.id.txtPassword);
         String password = txtPassword.getEditText().getText().toString();
-        if( TextUtils.isEmpty(password)) {
+        if (TextUtils.isEmpty(password)) {
             Toast.makeText(getApplicationContext(), R.string.emptyPasswordField, Toast.LENGTH_SHORT).show();
         } else {
             user = firebaseAuth.getCurrentUser();
@@ -75,7 +76,7 @@ public class popupDeleteDialogActivity extends AppCompatActivity {
                                         Intent intent = new Intent(popupDeleteDialogActivity.this, LoginActivity.class);
                                         intent.putExtra("allowBack", false);
                                         startActivity(intent);
-                                    }else{
+                                    } else {
                                         Toast.makeText(popupDeleteDialogActivity.this, "Something went wrong!",
                                                 Toast.LENGTH_SHORT).show();
                                         onBackPressed();
@@ -104,13 +105,14 @@ public class popupDeleteDialogActivity extends AppCompatActivity {
 
                             User test = snapshot.getValue(User.class);
                             snapshot.child("friends").hasChild(userId);
-                            Log.e("TEST", test.getFullname() +" ist befreundet mit "+ userId +": "+snapshot.child("friends").hasChild(userId));
-                            if(snapshot.child("friends").hasChild(userId)){
+                            Log.e("TEST", test.getFullname() + " ist befreundet mit " + userId + ": " + snapshot.child("friends").hasChild(userId));
+                            if (snapshot.child("friends").hasChild(userId)) {
                                 DatabaseReference drfUser = FirebaseDatabase.getInstance().getReference("Users").child(test.getId()).child("friends").child(userId);
                                 drfUser.removeValue();
                             }
                         }
                     }
+
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                     }
