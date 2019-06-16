@@ -19,8 +19,6 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
     return fromUser.then(fromUserResult => {
         let sender_id = fromUserResult.val().sender;
         let message = fromUserResult.val().message;
-        let click_action = fromUserResult.val().click_action;
-        let intentData = fromUserResult.val().intentData;
 
         let userQuery = admin.database().ref(`/Users/${sender_id}/fullname`).once('value');
         return userQuery.then(userQueryResult => {
@@ -33,11 +31,7 @@ exports.sendNotification = functions.database.ref('/Notifications/{user_id}/{not
                     notification: {
                         title: `${name}`,
                         body: `${message}`,
-                        icon: 'default',
-                        click_action: `${click_action}`
-                    }, 
-                    data: {
-                        intentData: `${intentData}`
+                        icon: 'default'
                     }
                 };
 
