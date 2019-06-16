@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
     tools:context=".RegisterActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:text="@string/register"
+        android:textColor="@color/colorPrimary"
+        android:textSize="40sp" />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/txtEmail"
         style="@style/TILStyle"
-        android:layout_width="350dp"
+        android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="20dp"
-        android:hint="@string/hint_email"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.488"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtFullName">
+        android:layout_marginEnd="8dp"
+        android:hint="@string/hint_email">
 
         <android.support.design.widget.TextInputEditText
             android:layout_width="match_parent"
@@ -29,16 +37,12 @@
     <android.support.design.widget.TextInputLayout
         android:id="@+id/txtFullName"
         style="@style/TILStyle"
-        android:layout_width="350dp"
+        android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="80dp"
-        android:hint="@string/hint_fullname"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.488"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        android:hint="@string/hint_fullname">
 
         <android.support.design.widget.TextInputEditText
             android:layout_width="match_parent"
@@ -49,16 +53,12 @@
     <android.support.design.widget.TextInputLayout
         android:id="@+id/txtUsername"
         style="@style/TILStyle"
-        android:layout_width="350dp"
+        android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="240dp"
-        android:hint="@string/hint_username"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.488"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        android:hint="@string/hint_username">
 
         <android.support.design.widget.TextInputEditText
             android:layout_width="match_parent"
@@ -69,17 +69,13 @@
     <android.support.design.widget.TextInputLayout
         android:id="@+id/txtPassword"
         style="@style/TILStyle"
-        android:layout_width="350dp"
-        android:layout_height="57dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="92dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
         android:hint="@string/hint_password"
         app:errorEnabled="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.488"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtEmail"
         app:passwordToggleEnabled="true">>
 
         <android.support.design.widget.TextInputEditText
@@ -91,17 +87,13 @@
     <android.support.design.widget.TextInputLayout
         android:id="@+id/txtRepeatPassword"
         style="@style/TILStyle"
-        android:layout_width="350dp"
-        android:layout_height="56dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
         android:hint="@string/hint_repeat_password"
         app:errorEnabled="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.488"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtPassword"
         app:passwordToggleEnabled="true">
 
         <android.support.design.widget.TextInputEditText
@@ -110,29 +102,14 @@
             android:inputType="textPassword" />
     </android.support.design.widget.TextInputLayout>
 
-
     <Button
         android:id="@+id/btnRegister"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="148dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/button_register"
-        android:theme="@style/MyButton"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtRepeatPassword"
-        app:layout_constraintVertical_bias="0.08" />
+        android:theme="@style/MyButton" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="348dp"
-        android:layout_height="67dp"
-        android:text="Register"
-        android:textAlignment="center"
-        android:textSize="45sp"
-        tools:layout_editor_absoluteX="18dp"
-        tools:layout_editor_absoluteY="2dp" />
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

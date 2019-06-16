@@ -41,7 +41,6 @@ public class LoginActivity extends AppCompatActivity {
         final TextInputLayout txtEmail = findViewById(R.id.txtEmail);
         final TextInputLayout txtPassword = findViewById(R.id.txtPassword);
         final Button btnLogin = findViewById(R.id.btnLogin);
-        final Button btnRegister = findViewById(R.id.btnRegister);
 
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() != null) {
@@ -87,15 +86,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(intent);
-            }
-        });
-
     }
 
     @Override
@@ -103,6 +93,11 @@ public class LoginActivity extends AppCompatActivity {
         if (allowBack) {
             super.onBackPressed();
         }
+    }
+
+    public void register(View v) {
+        Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+        startActivity(intent);
     }
 
 

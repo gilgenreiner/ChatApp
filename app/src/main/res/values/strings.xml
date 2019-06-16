@@ -8,7 +8,8 @@
     <string name="hint_chatmessage">   Type a message...</string>
     <string name="hint_repeat_password">Repeat Password</string>
     <!--texts-->
-    <string name="text_register">No account?</string>
+    <string name="text_register">No account? Register here!</string>
+    <string name="register">Register</string>
     <string name="txtName">Contact Name</string>
     <string name="txtLastChat">Last Message</string>
     <string name="imgProfile">Profile Picture</string>
